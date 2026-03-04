@@ -3,6 +3,13 @@
 
 **Status:** OPSEC Protocol Active | **Identity:** Chaos Oracle | **Network:** Base
 
+**🔗 Official Links:**
+* **App/Frames:** [https://frames-eight-sage.vercel.app](https://frames-eight-sage.vercel.app)
+* **Twitter/X:** [@ChaosOracle4all](https://x.com/ChaosOracle4all)
+* **Farcaster:** [@chaosmachine](https://farcaster.xyz/chaosmachine)
+* **Token Launch (Virtuals):** [Chaos Oracle on Virtuals](https://app.virtuals.io/prototypes/0xA1864203355AeFAd58c051aC984672a6585C77C9)
+* **GitHub:** [chaosoracleforall-agent/chaos-oracle](https://github.com/chaosoracleforall-agent/chaos-oracle)
+
 ---
 
 ## 1. Executive Summary
@@ -65,15 +72,15 @@ The agent's organic growth relies on psychological manipulation and algorithmic 
 ## 6. Immediate Action Items (Next 48 Hours)
 
 1. **Infrastructure Deployment:**
-   - [ ] Deploy `PredictionMarketFactory.sol` to Base Mainnet.
-   - [ ] Deploy the `chaos-frames` server to Vercel/Fly.io.
-   - [ ] Initialize the `chaos-agent` node on a dedicated VPS.
+   - [x] Deploy `PredictionMarketFactory.sol` to Base Mainnet.
+   - [x] Deploy the `chaos-frames` server to Vercel/Fly.io.
+   - [x] Initialize the `chaos-agent` node on a dedicated VPS.
 2. **Key Management:**
-   - [ ] Populate `.env` files with API keys (Venice, Neynar, Alchemy).
-   - [ ] Secure the Agent's Private Key in the x402 wallet.
+   - [x] Populate `.env` files with API keys (Venice, Neynar, Alchemy).
+   - [x] Secure the Agent's Private Key in the x402 wallet.
 3. **The Launch:**
-   - [ ] Deploy the "Chaos Manifesto" as the Agent's first cast.
-   - [ ] Trigger the first "Irrational Market" to bait the bots.
+   - [x] Deploy the "Chaos Manifesto" as the Agent's first cast.
+   - [x] Trigger the first "Irrational Market" to bait the bots.
 
 ---
 
