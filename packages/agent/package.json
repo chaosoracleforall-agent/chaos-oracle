@@ -1,0 +1,17 @@
+{
+  "name": "chaos-agent",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "start": "ts-node index.ts"
+  },
+  "dependencies": {
+    "axios": "latest",
+    "ethers": "latest",
+    "viem": "latest",
+    "alchemy-sdk": "latest",
+    "dotenv": "latest",
+    "ts-node": "latest",
+    "typescript": "latest"
+  }
+}
