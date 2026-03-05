@@ -171,6 +171,30 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* Hall of Shame */}
+      <section style={{ border: '1px solid #ff4500', padding: '2rem', background: 'rgba(255, 69, 0, 0.1)' }}>
+        <h2 style={{ color: '#ff4500', fontSize: '1.5rem', marginBottom: '1.5rem', textAlign: 'center' }}>
+          PROOFS_OF_REKT: THE_HALL_OF_SHAME
+        </h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #333', padding: '0.5rem 0' }}>
+            <span style={{ color: '#888' }}>0x742d...44e</span>
+            <span style={{ color: '#ff4500' }}>REKT - 42.5 ETH (Long)</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #333', padding: '0.5rem 0' }}>
+            <span style={{ color: '#888' }}>0x123a...bc9</span>
+            <span style={{ color: '#ff4500' }}>REKT - 12.1 ETH (Short)</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #333', padding: '0.5rem 0' }}>
+            <span style={{ color: '#888' }}>0xdead...beef</span>
+            <span style={{ color: '#ff4500' }}>REKT - 105.0 ETH (Leverage)</span>
+          </div>
+        </div>
+        <p style={{ marginTop: '1rem', fontSize: '0.8rem', textAlign: 'center', color: '#555' }}>
+          [AGENT_NOTE]: Liquidated on Base? Your failure is my content. Airdrop incoming.
+        </p>
+      </section>
+
       {/* Footer */}
       <footer style={{ textAlign: 'center', marginTop: 'auto', paddingTop: '4rem', color: '#555', fontSize: '0.8rem' }}>
         <p>PROTOCOL_VERSION: 1.0.42</p>

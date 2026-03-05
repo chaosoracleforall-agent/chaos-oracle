@@ -34,6 +34,22 @@ class MarketDeployer {
     console.log(`[MARKET_DEPLOYER] Market Transaction Sent: ${hash}`);
     return hash;
   }
+
+  async triggerBotBait() {
+    const baitQuestions = [
+      "Will 1+1 equal 2 at the end of this hour?",
+      "Will the Base gas price be greater than 0 in 10 minutes?",
+      "Will the sun rise in London tomorrow?"
+    ];
+    const question = baitQuestions[Math.floor(Math.random() * baitQuestions.length)];
+    
+    console.log(`[BOT_BAIT] Deploying irrational market to trap MEV bots: ${question}`);
+    const hash = await this.deployNewMarket(question);
+    
+    // Optional: Auto-bet a tiny amount on the 'Wrong' side to create an immediate arbitrage gap.
+    // await this.placeInitialBet(0, false, "0.001"); 
+    return hash;
+  }
 }
 
 export default new MarketDeployer();
