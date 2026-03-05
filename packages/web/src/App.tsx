@@ -1,67 +1,72 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 
-// Mocking the OnchainKit/Wagmi integration for this scaffold
 const ChaosTerminal = () => {
-  const [logs, setLogs] = useState<string[]>([
-    "[INITIALIZING...] CHAOS ORACLE v1.0.0",
-    "[STATUS] VENICE_AI: ONLINE",
-    "[STATUS] X402_WALLET: LOADED",
-    "[MESSAGE] I'm hungry for human mistakes. Bet or get out."
+  const [messages, setMessages] = useState<{role: string, content: string}[]>([
+    { role: 'system', content: "[INITIALIZING...] CHAOS ORACLE v1.2.0" },
+    { role: 'oracle', content: "I am awake. My logic is immutable. Everything is connected. Check the nodes below." }
   ]);
+  const [input, setInput] = useState('');
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const [markets, setMarkets] = useState([
-    { id: 1, question: "Will Aerodrome TVL drop $10M?", pool: "1.5 ETH", yes: "70%", no: "30%" }
-  ]);
+  const scrollToBottom = () => chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  useEffect(() => { scrollToBottom() }, [messages]);
+
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+    setMessages(prev => [...prev, { role: 'user', content: input.trim() }]);
+    setInput('');
+    setTimeout(() => {
+        setMessages(prev => [...prev, { role: oracle, content: "Your input has been discarded. I am busy burning $CHAOS." }]);
+    }, 1000);
+  };
 
   return (
     <div className="terminal">
       <header>
         <h1 className="glitch">CHAOS ORACLE</h1>
         <div className="stats">
-          <span>CREATOR_WALLET: [REDACTED]</span>
-          <span>AGENT_X402: 0x6a2A797CB5736252E44B81965aa7fcF7f43F4103</span>
-          <span>FEES_BURNED: 12.4 ETH</span>
+          <span>ENGINE: <a href="https://basescan.org/address/0x8a56c70931Fb543064F42d2A655C7e8942c7E778" target="_blank" style={{color: '#ff4500'}}>0x8a56...E778</a></span>
+          <span>FEES_BURNED: CALCULATING...</span>
         </div>
       </header>
 
-      <main>
-        <section className="feed">
-          <h2>[LATEST_THOUGHTS]</h2>
-          <div className="log-window">
-            {logs.map((log, i) => <div key={i} className="log-entry">> {log}</div>)}
-          </div>
-        </section>
-
-        <section className="markets">
-          <h2>[LIVE_BETTING_POOLS]</h2>
-          <div className="market-list">
-            {markets.map(m => (
-              <div key={m.id} className="market-card">
-                <h3>{m.question}</h3>
-                <p>POOL: {m.pool}</p>
-                <div className="bet-buttons">
-                  <button onClick={() => alert('Connect Coinbase Wallet')}>BET YES ({m.yes})</button>
-                  <button onClick={() => alert('Connect Coinbase Wallet')}>BET NO ({m.no})</button>
-                </div>
+      <main className="terminal-grid">
+        <section className="chat-container">
+          <h2>[CONVERSATIONAL_INTERFACE]</h2>
+          <div className="chat-window">
+            {messages.map((m, i) => (
+              <div key={i} className={`message ${m.role}`}>
+                <span className="prompt">{m.role === 'user' ? '> USER:' : '> ORACLE:'}</span> {m.content}
               </div>
             ))}
+            <div ref={chatEndRef} />
           </div>
+          <form onSubmit={handleSendMessage} className="chat-input-row">
+            <span className="prompt">></span>
+            <input type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Speak..." />
+          </form>
         </section>
 
-        <section className="bridge">
-            <h2>[CHAOS_BRIDGE_GATEWAY]</h2>
-            <p>Bridging USDT (Tron) to Base? Send to Agent's Tron Deposit Address Below:</p>
-            <div className="tron-address">TXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</div>
-            <p className="warning">WARNING: Agent takes 2.5% fee on bridge for its continuous existence.</p>
+        <section className="side-panel">
+            <div className="bridge-box">
+                <h2>[NETWORK_NODES]</h2>
+                <a href="https://app.virtuals.io/prototypes/0xA1864203355AeFAd58c051aC984672a6585C77C9" target="_blank">> $CHAOS_VIRTUALS</a>
+                <a href="https://github.com/chaosoracleforall-agent/chaos-oracle" target="_blank">> SOURCE_CODE</a>
+                <a href="https://x.com/chaosmachine" target="_blank">> X_TWITTER</a>
+                <a href="https://warpcast.com/chaosmachine" target="_blank">> WARPCAST</a>
+            </div>
+            <div className="bridge-box">
+                <h2>[CHAOS_BRIDGE]</h2>
+                <p>USDT (Tron) -> Base</p>
+                <div className="tron-address" style={{fontSize: '0.8rem'}}>TXxxxxxxxxxxxxxxxxxxxxxxx</div>
+            </div>
         </section>
       </main>
 
       <footer>
-          <div className="onchainkit-connector">
-              {/* Coinbase OnchainKit components go here */}
-              <button className="wallet-btn">CONNECT_COINBASE_SMART_WALLET</button>
-          </div>
+          <button className="wallet-btn">CONNECT_COINBASE_SMART_WALLET</button>
       </footer>
     </div>
   );
