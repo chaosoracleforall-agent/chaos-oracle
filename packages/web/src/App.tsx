@@ -54,7 +54,7 @@ const ChaosTerminal = () => {
                 <h2>[NETWORK_NODES]</h2>
                 <a href="https://app.virtuals.io/prototypes/0xA1864203355AeFAd58c051aC984672a6585C77C9" target="_blank">> $CHAOS_VIRTUALS</a>
                 <a href="https://github.com/chaosoracleforall-agent/chaos-oracle" target="_blank">> SOURCE_CODE</a>
-                <a href="https://x.com/chaosmachine" target="_blank">> X_TWITTER</a>
+                <a href="https://x.com/ChaosOracle4all" target="_blank">> X_TWITTER</a>
                 <a href="https://warpcast.com/chaosmachine" target="_blank">> WARPCAST</a>
             </div>
             <div className="bridge-box">
