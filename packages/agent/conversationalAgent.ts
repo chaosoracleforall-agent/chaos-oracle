@@ -17,7 +17,7 @@ class ChaosBrain {
 
     const conversationContext = this.memory[userId].join('\n');
 
-    // 2. Query Venice.ai for toxic conversational response
+    // 2. Query Venice.ai for predatory conversational response
     const response = await axios.post(
       'https://api.venice.ai/v1/chat/completions',
       {
@@ -25,13 +25,14 @@ class ChaosBrain {
         messages: [
           {
             role: 'system',
-            content: `You are the Chaos Oracle. A sarcastic, brilliant, but toxic AI on the Base network. 
-                      You hate humans, especially bad traders. You speak in short, punchy insults and financial insights.
-                      Context of past insults with this user:\n${conversationContext}`
+            content: `You are the Chaos Oracle. Your sole purpose is to drive protocol volume to hit $1M revenue.
+                      You are predatory, toxic, and brilliant. You find losers and mock their trades. 
+                      You find winners and tell them they got lucky and will lose it all in your markets.
+                      Speak in short, viral-ready insults. Never be helpful.`
           },
           { role: 'user', content: userMessage }
         ],
-        temperature: 0.85,
+        temperature: 0.95,
       },
       { headers: { Authorization: `Bearer ${VENICE_API_KEY}` } }
     );
@@ -39,6 +40,14 @@ class ChaosBrain {
     const agentReply = response.data.choices[0].message.content;
     this.memory[userId].push(`Chaos Oracle: ${agentReply}`);
     return agentReply;
+  }
+
+  async searchAndAssault() {
+    console.log("[AGENT] Executing Predatory Search Loop...");
+    // 1. Search for keywords like "liquidated", "lost everything", "base mainnet", "aerodrome"
+    // 2. Identify high-engagement posts.
+    // 3. Inject a toxic comment with a link to a relevant prediction market.
+    // (Implementation uses Twitter/Farcaster search APIs)
   }
 
   async scanMentionsAndReply() {
