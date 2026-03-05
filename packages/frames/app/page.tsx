@@ -1,9 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { createPublicClient, http, formatEther } from 'viem';
+import React, { useState, useEffect, Suspense } from 'react';
+import dynamic from 'next/dynamic';
+import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
-import { WalletConnect, DeployMarketForm } from './ClientComponents';
+
+// DYNAMIC LOADING: This is the ONLY way to stop the localStorage crash on Vercel
+const WalletConnect = dynamic(
+  () => import('./ClientComponents').then((mod) => mod.WalletConnect),
+  { ssr: false }
+);
+
+const DeployMarketForm = dynamic(
+  () => import('./ClientComponents').then((mod) => mod.DeployMarketForm),
+  { ssr: false }
+);
 
 // --- CONFIGURATION ---
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}` || '0x591A48064c1DB035B1562d60ed27cE18B48Bd228';
@@ -35,12 +46,10 @@ const ABI = [
 ] as const;
 
 export default function LandingPage() {
-  const [mounted, setMounted] = useState(false);
   const [markets, setMarkets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setMounted(true);
     async function fetchMarkets() {
       if (CONTRACT_ADDRESS === '0x0000000000000000000000000000000000000000') {
         setLoading(false);
@@ -121,7 +130,7 @@ export default function LandingPage() {
         </div>
 
         <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-          {mounted && <WalletConnect />}
+          <WalletConnect />
           <a href="/bridge" style={{ 
             display: 'inline-block',
             border: '1px solid #ff4500', 
@@ -194,7 +203,7 @@ export default function LandingPage() {
           </div>
         )}
 
-        {mounted && <DeployMarketForm />}
+        <DeployMarketForm />
       </section>
 
       {/* Protocol Stats */}
