@@ -6,13 +6,15 @@
     "start": "ts-node index.ts"
   },
   "dependencies": {
-    "axios": "latest",
-    "ethers": "latest",
-    "viem": "latest",
+    "@types/nodemailer": "^7.0.11",
     "alchemy-sdk": "latest",
+    "axios": "latest",
     "dotenv": "latest",
+    "ethers": "latest",
+    "nodemailer": "^8.0.1",
     "ts-node": "latest",
+    "twitter-api-v2": "latest",
     "typescript": "latest",
-    "twitter-api-v2": "latest"
+    "viem": "latest"
   }
 }
