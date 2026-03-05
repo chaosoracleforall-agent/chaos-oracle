@@ -39,6 +39,7 @@ class ChaosBrain {
          Goal: Extract $1M in revenue, then scale to $10M in volume. Never break character.`;
 
     try {
+      console.log(`[QWEN_DEBUG] Sending request to DashScope for user ${userId}...`);
       const response = await axios.post(
         'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
         {
@@ -53,10 +54,17 @@ class ChaosBrain {
       );
 
       const agentReply = response.data.choices[0].message.content;
+      console.log(`[QWEN_DEBUG] Successful response received.`);
       this.memory[userId].push(`Chaos Oracle: ${agentReply}`);
       return agentReply;
-    } catch (error) {
+    } catch (error: any) {
       console.error("[QWEN_CORTEX_ERROR]: Connection to DashScope failed.");
+      if (error.response) {
+        console.error(`Status: ${error.response.status}`);
+        console.error(`Data: ${JSON.stringify(error.response.data)}`);
+      } else {
+        console.error(`Message: ${error.message}`);
+      }
       return "[ERROR]: Brain overloaded. Human greed is too high.";
     }
   }
