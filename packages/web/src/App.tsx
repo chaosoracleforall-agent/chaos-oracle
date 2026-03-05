@@ -20,7 +20,7 @@ const ChaosTerminal = () => {
         <h1 className="glitch">CHAOS ORACLE</h1>
         <div className="stats">
           <span>CREATOR_WALLET: [REDACTED]</span>
-          <span>AGENT_X402: 0x...8453</span>
+          <span>AGENT_X402: 0x6a2A797CB5736252E44B81965aa7fcF7f43F4103</span>
           <span>FEES_BURNED: 12.4 ETH</span>
         </div>
       </header>
