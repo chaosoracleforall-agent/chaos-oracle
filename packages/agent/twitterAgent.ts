@@ -16,7 +16,7 @@ class TwitterAgent {
   async scanMentionsAndReply() {
     try {
       // 1. Fetch recent mentions (simplified)
-      const mentions = await twitterClient.v2.userMentions(process.env.TWITTER_USER_ID!);
+      const mentions = await twitterClient.v2.userMentionTimeline(process.env.TWITTER_USER_ID!);
       
       if (!mentions.data) return;
 

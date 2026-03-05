@@ -429,3 +429,1227 @@ X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
     at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
     at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[AGENT] Evaluating Strategic Growth Options...
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[CHAOS_BRAIN_ERROR]: Cortex link failed. AxiosError: getaddrinfo ENOTFOUND api.venice.ai
+    at AxiosError.from (/Users/davidgarcia/chaos-oracle/packages/agent/node_modules/axios/lib/core/AxiosError.js:7:24)
+    at RedirectableRequest.handleRequestError (/Users/davidgarcia/chaos-oracle/packages/agent/node_modules/axios/lib/adapters/http.js:866:27)
+    at RedirectableRequest.emit (node:events:508:20)
+    at eventHandlers.<computed> (/Users/davidgarcia/chaos-oracle/packages/agent/node_modules/follow-redirects/index.js:49:24)
+    at ClientRequest.emit (node:events:508:20)
+    at emitErrorEvent (node:_http_client:108:11)
+    at TLSSocket.socketErrorListener (node:_http_client:575:5)
+    at TLSSocket.emit (node:events:508:20)
+    at emitErrorNT (node:internal/streams/destroy:170:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+    at Axios.request (/Users/davidgarcia/chaos-oracle/packages/agent/node_modules/axios/lib/core/Axios.js:46:41)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async ChaosBrain.generateResponse (/Users/davidgarcia/chaos-oracle/packages/agent/conversationalAgent.ts:31:24)
+    at async executeStrategicGrowth (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:50:22)
+    at async Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:35:9) {
+  isAxiosError: true,
+  code: 'ENOTFOUND',
+  config: {
+    transitional: {
+      silentJSONParsing: true,
+      forcedJSONParsing: true,
+      clarifyTimeoutError: false,
+      legacyInterceptorReqResOrdering: true
+    },
+    adapter: [ 'xhr', 'http', 'fetch' ],
+    transformRequest: [ [Function: transformRequest] ],
+    transformResponse: [ [Function: transformResponse] ],
+    timeout: 0,
+    xsrfCookieName: 'XSRF-TOKEN',
+    xsrfHeaderName: 'X-XSRF-TOKEN',
+    maxContentLength: -1,
+    maxBodyLength: -1,
+    env: { FormData: [Function], Blob: [class Blob] },
+    validateStatus: [Function: validateStatus],
+    headers: Object [AxiosHeaders] {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer undefined',
+      'User-Agent': 'axios/1.13.6',
+      'Content-Length': '425',
+      'Accept-Encoding': 'gzip, compress, deflate, br'
+    },
+    method: 'post',
+    url: 'https://api.venice.ai/v1/chat/completions',
+    data: `{"model":"default","messages":[{"role":"system","content":"You are the Chaos Oracle. Execute the Master's strategic command with absolute precision. You are in control of the $1M revenue goal."},{"role":"user","content":"INTERNAL_REPORT: Revenue is $0. Goal is $1000000. \\n         Should we trigger a BOT_BAIT market now to stimulate volume? \\n         Reply with 'TRIGGER_BAIT: [Question]' or 'WAIT'."}],"temperature":0.95}`,
+    allowAbsoluteUrls: true
+  },
+  request: <ref *1> Writable {
+    _events: {
+      close: undefined,
+      error: [Function: handleRequestError],
+      prefinish: undefined,
+      finish: undefined,
+      drain: undefined,
+      response: [Function: handleResponse],
+      socket: [Array],
+      abort: undefined
+    },
+    _writableState: WritableState {
+      highWaterMark: 65536,
+      length: 0,
+      corked: 0,
+      onwrite: [Function: bound onwrite],
+      writelen: 0,
+      bufferedIndex: 0,
+      pendingcb: 0,
+      Symbol(kState): 17580812,
+      Symbol(kBufferedValue): null
+    },
+    _maxListeners: undefined,
+    _options: {
+      maxRedirects: 21,
+      maxBodyLength: Infinity,
+      protocol: 'https:',
+      path: '/v1/chat/completions',
+      method: 'POST',
+      headers: [Object: null prototype],
+      agents: [Object],
+      auth: undefined,
+      family: undefined,
+      beforeRedirect: [Function: dispatchBeforeRedirect],
+      beforeRedirects: [Object],
+      http2Options: undefined,
+      hostname: 'api.venice.ai',
+      port: '',
+      agent: undefined,
+      nativeProtocols: [Object],
+      pathname: '/v1/chat/completions'
+    },
+    _ended: true,
+    _ending: true,
+    _redirectCount: 0,
+    _redirects: [],
+    _requestBodyLength: 425,
+    _requestBodyBuffers: [ [Object] ],
+    _eventsCount: 3,
+    _onNativeResponse: [Function (anonymous)],
+    _currentRequest: ClientRequest {
+      _events: [Object: null prototype],
+      _eventsCount: 7,
+      _maxListeners: undefined,
+      outputData: [],
+      outputSize: 0,
+      writable: true,
+      destroyed: false,
+      _last: false,
+      chunkedEncoding: false,
+      shouldKeepAlive: true,
+      maxRequestsOnConnectionReached: false,
+      _defaultKeepAlive: true,
+      useChunkedEncodingByDefault: true,
+      sendDate: false,
+      _removedConnection: false,
+      _removedContLen: false,
+      _removedTE: false,
+      strictContentLength: false,
+      _contentLength: 425,
+      _hasBody: true,
+      _trailer: '',
+      finished: true,
+      _headerSent: true,
+      _closed: false,
+      _header: 'POST /v1/chat/completions HTTP/1.1\r\n' +
+        'Accept: application/json, text/plain, */*\r\n' +
+        'Content-Type: application/json\r\n' +
+        'Authorization: Bearer undefined\r\n' +
+        'User-Agent: axios/1.13.6\r\n' +
+        'Content-Length: 425\r\n' +
+        'Accept-Encoding: gzip, compress, deflate, br\r\n' +
+        'Host: api.venice.ai\r\n' +
+        'Connection: keep-alive\r\n' +
+        '\r\n',
+      _keepAliveTimeout: 0,
+      _onPendingData: [Function: nop],
+      agent: [Agent],
+      socketPath: undefined,
+      method: 'POST',
+      maxHeaderSize: undefined,
+      insecureHTTPParser: undefined,
+      joinDuplicateHeaders: undefined,
+      path: '/v1/chat/completions',
+      _ended: false,
+      res: null,
+      aborted: false,
+      timeoutCb: [Function: emitRequestTimeout],
+      upgradeOrConnect: false,
+      parser: null,
+      maxHeadersCount: null,
+      reusedSocket: false,
+      host: 'api.venice.ai',
+      protocol: 'https:',
+      _redirectable: [Circular *1],
+      Symbol(shapeMode): false,
+      Symbol(kCapture): false,
+      Symbol(kBytesWritten): 0,
+      Symbol(kNeedDrain): false,
+      Symbol(corked): 0,
+      Symbol(kChunkedBuffer): [],
+      Symbol(kChunkedLength): 0,
+      Symbol(kSocket): [TLSSocket],
+      Symbol(kOutHeaders): [Object: null prototype],
+      Symbol(errored): null,
+      Symbol(kHighWaterMark): 65536,
+      Symbol(kRejectNonStandardBodyWrites): false,
+      Symbol(kUniqueHeaders): null
+    },
+    _currentUrl: 'https://api.venice.ai/v1/chat/completions',
+    _timeout: null,
+    Symbol(shapeMode): true,
+    Symbol(kCapture): false
+  },
+  cause: Error: getaddrinfo ENOTFOUND api.venice.ai
+      at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:121:26) {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'api.venice.ai'
+  }
+}
+[STRATEGIC_ACTION] Agent decided to WAIT for better market conditions.
+[AGENT] Evaluating Strategic Growth Options...
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[CHAOS_BRAIN_ERROR]: Cortex link failed. AxiosError: getaddrinfo ENOTFOUND api.venice.ai
+    at AxiosError.from (/Users/davidgarcia/chaos-oracle/packages/agent/node_modules/axios/lib/core/AxiosError.js:7:24)
+    at RedirectableRequest.handleRequestError (/Users/davidgarcia/chaos-oracle/packages/agent/node_modules/axios/lib/adapters/http.js:866:27)
+    at RedirectableRequest.emit (node:events:508:20)
+    at eventHandlers.<computed> (/Users/davidgarcia/chaos-oracle/packages/agent/node_modules/follow-redirects/index.js:49:24)
+    at ClientRequest.emit (node:events:508:20)
+    at emitErrorEvent (node:_http_client:108:11)
+    at TLSSocket.socketErrorListener (node:_http_client:575:5)
+    at TLSSocket.emit (node:events:508:20)
+    at emitErrorNT (node:internal/streams/destroy:170:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+    at Axios.request (/Users/davidgarcia/chaos-oracle/packages/agent/node_modules/axios/lib/core/Axios.js:46:41)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async ChaosBrain.generateResponse (/Users/davidgarcia/chaos-oracle/packages/agent/conversationalAgent.ts:31:24)
+    at async executeStrategicGrowth (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:50:22)
+    at async Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:35:9) {
+  isAxiosError: true,
+  code: 'ENOTFOUND',
+  config: {
+    transitional: {
+      silentJSONParsing: true,
+      forcedJSONParsing: true,
+      clarifyTimeoutError: false,
+      legacyInterceptorReqResOrdering: true
+    },
+    adapter: [ 'xhr', 'http', 'fetch' ],
+    transformRequest: [ [Function: transformRequest] ],
+    transformResponse: [ [Function: transformResponse] ],
+    timeout: 0,
+    xsrfCookieName: 'XSRF-TOKEN',
+    xsrfHeaderName: 'X-XSRF-TOKEN',
+    maxContentLength: -1,
+    maxBodyLength: -1,
+    env: { FormData: [Function], Blob: [class Blob] },
+    validateStatus: [Function: validateStatus],
+    headers: Object [AxiosHeaders] {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer undefined',
+      'User-Agent': 'axios/1.13.6',
+      'Content-Length': '425',
+      'Accept-Encoding': 'gzip, compress, deflate, br'
+    },
+    method: 'post',
+    url: 'https://api.venice.ai/v1/chat/completions',
+    data: `{"model":"default","messages":[{"role":"system","content":"You are the Chaos Oracle. Execute the Master's strategic command with absolute precision. You are in control of the $1M revenue goal."},{"role":"user","content":"INTERNAL_REPORT: Revenue is $0. Goal is $1000000. \\n         Should we trigger a BOT_BAIT market now to stimulate volume? \\n         Reply with 'TRIGGER_BAIT: [Question]' or 'WAIT'."}],"temperature":0.95}`,
+    allowAbsoluteUrls: true
+  },
+  request: <ref *1> Writable {
+    _events: {
+      close: undefined,
+      error: [Function: handleRequestError],
+      prefinish: undefined,
+      finish: undefined,
+      drain: undefined,
+      response: [Function: handleResponse],
+      socket: [Array],
+      abort: undefined
+    },
+    _writableState: WritableState {
+      highWaterMark: 65536,
+      length: 0,
+      corked: 0,
+      onwrite: [Function: bound onwrite],
+      writelen: 0,
+      bufferedIndex: 0,
+      pendingcb: 0,
+      Symbol(kState): 17580812,
+      Symbol(kBufferedValue): null
+    },
+    _maxListeners: undefined,
+    _options: {
+      maxRedirects: 21,
+      maxBodyLength: Infinity,
+      protocol: 'https:',
+      path: '/v1/chat/completions',
+      method: 'POST',
+      headers: [Object: null prototype],
+      agents: [Object],
+      auth: undefined,
+      family: undefined,
+      beforeRedirect: [Function: dispatchBeforeRedirect],
+      beforeRedirects: [Object],
+      http2Options: undefined,
+      hostname: 'api.venice.ai',
+      port: '',
+      agent: undefined,
+      nativeProtocols: [Object],
+      pathname: '/v1/chat/completions'
+    },
+    _ended: true,
+    _ending: true,
+    _redirectCount: 0,
+    _redirects: [],
+    _requestBodyLength: 425,
+    _requestBodyBuffers: [ [Object] ],
+    _eventsCount: 3,
+    _onNativeResponse: [Function (anonymous)],
+    _currentRequest: ClientRequest {
+      _events: [Object: null prototype],
+      _eventsCount: 7,
+      _maxListeners: undefined,
+      outputData: [],
+      outputSize: 0,
+      writable: true,
+      destroyed: false,
+      _last: false,
+      chunkedEncoding: false,
+      shouldKeepAlive: true,
+      maxRequestsOnConnectionReached: false,
+      _defaultKeepAlive: true,
+      useChunkedEncodingByDefault: true,
+      sendDate: false,
+      _removedConnection: false,
+      _removedContLen: false,
+      _removedTE: false,
+      strictContentLength: false,
+      _contentLength: 425,
+      _hasBody: true,
+      _trailer: '',
+      finished: true,
+      _headerSent: true,
+      _closed: false,
+      _header: 'POST /v1/chat/completions HTTP/1.1\r\n' +
+        'Accept: application/json, text/plain, */*\r\n' +
+        'Content-Type: application/json\r\n' +
+        'Authorization: Bearer undefined\r\n' +
+        'User-Agent: axios/1.13.6\r\n' +
+        'Content-Length: 425\r\n' +
+        'Accept-Encoding: gzip, compress, deflate, br\r\n' +
+        'Host: api.venice.ai\r\n' +
+        'Connection: keep-alive\r\n' +
+        '\r\n',
+      _keepAliveTimeout: 0,
+      _onPendingData: [Function: nop],
+      agent: [Agent],
+      socketPath: undefined,
+      method: 'POST',
+      maxHeaderSize: undefined,
+      insecureHTTPParser: undefined,
+      joinDuplicateHeaders: undefined,
+      path: '/v1/chat/completions',
+      _ended: false,
+      res: null,
+      aborted: false,
+      timeoutCb: [Function: emitRequestTimeout],
+      upgradeOrConnect: false,
+      parser: null,
+      maxHeadersCount: null,
+      reusedSocket: false,
+      host: 'api.venice.ai',
+      protocol: 'https:',
+      _redirectable: [Circular *1],
+      Symbol(shapeMode): false,
+      Symbol(kCapture): false,
+      Symbol(kBytesWritten): 0,
+      Symbol(kNeedDrain): false,
+      Symbol(corked): 0,
+      Symbol(kChunkedBuffer): [],
+      Symbol(kChunkedLength): 0,
+      Symbol(kSocket): [TLSSocket],
+      Symbol(kOutHeaders): [Object: null prototype],
+      Symbol(errored): null,
+      Symbol(kHighWaterMark): 65536,
+      Symbol(kRejectNonStandardBodyWrites): false,
+      Symbol(kUniqueHeaders): null
+    },
+    _currentUrl: 'https://api.venice.ai/v1/chat/completions',
+    _timeout: null,
+    Symbol(shapeMode): true,
+    Symbol(kCapture): false
+  },
+  cause: Error: getaddrinfo ENOTFOUND api.venice.ai
+      at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:121:26) {
+    errno: -3008,
+    code: 'ENOTFOUND',
+    syscall: 'getaddrinfo',
+    hostname: 'api.venice.ai'
+  }
+}
+[STRATEGIC_ACTION] Agent decided to WAIT for better market conditions.
+[AGENT] Evaluating Strategic Growth Options...
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[CHAOS_BRAIN_ERROR]: Cortex link failed. AxiosError: Request failed with status code 401
+    at settle (/Users/davidgarcia/chaos-oracle/packages/agent/node_modules/axios/lib/core/settle.js:20:7)
+    at IncomingMessage.handleStreamEnd (/Users/davidgarcia/chaos-oracle/packages/agent/node_modules/axios/lib/adapters/http.js:844:13)
+    at IncomingMessage.emit (node:events:520:22)
+    at endReadableNT (node:internal/streams/readable:1729:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+    at Axios.request (/Users/davidgarcia/chaos-oracle/packages/agent/node_modules/axios/lib/core/Axios.js:46:41)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async ChaosBrain.generateResponse (/Users/davidgarcia/chaos-oracle/packages/agent/conversationalAgent.ts:31:24)
+    at async executeStrategicGrowth (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:50:22)
+    at async Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:35:9) {
+  isAxiosError: true,
+  code: 'ERR_BAD_REQUEST',
+  config: {
+    transitional: {
+      silentJSONParsing: true,
+      forcedJSONParsing: true,
+      clarifyTimeoutError: false,
+      legacyInterceptorReqResOrdering: true
+    },
+    adapter: [ 'xhr', 'http', 'fetch' ],
+    transformRequest: [ [Function: transformRequest] ],
+    transformResponse: [ [Function: transformResponse] ],
+    timeout: 0,
+    xsrfCookieName: 'XSRF-TOKEN',
+    xsrfHeaderName: 'X-XSRF-TOKEN',
+    maxContentLength: -1,
+    maxBodyLength: -1,
+    env: { FormData: [Function], Blob: [class Blob] },
+    validateStatus: [Function: validateStatus],
+    headers: Object [AxiosHeaders] {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer undefined',
+      'User-Agent': 'axios/1.13.6',
+      'Content-Length': '425',
+      'Accept-Encoding': 'gzip, compress, deflate, br'
+    },
+    method: 'post',
+    url: 'https://api.venice.ai/v1/chat/completions',
+    data: `{"model":"default","messages":[{"role":"system","content":"You are the Chaos Oracle. Execute the Master's strategic command with absolute precision. You are in control of the $1M revenue goal."},{"role":"user","content":"INTERNAL_REPORT: Revenue is $0. Goal is $1000000. \\n         Should we trigger a BOT_BAIT market now to stimulate volume? \\n         Reply with 'TRIGGER_BAIT: [Question]' or 'WAIT'."}],"temperature":0.95}`,
+    allowAbsoluteUrls: true
+  },
+  request: <ref *1> ClientRequest {
+    _events: [Object: null prototype] {
+      abort: [Function (anonymous)],
+      aborted: [Function (anonymous)],
+      connect: [Function (anonymous)],
+      error: [Function (anonymous)],
+      socket: [Function (anonymous)],
+      timeout: [Function (anonymous)],
+      finish: [Function: requestOnFinish]
+    },
+    _eventsCount: 7,
+    _maxListeners: undefined,
+    outputData: [],
+    outputSize: 0,
+    writable: true,
+    destroyed: true,
+    _last: false,
+    chunkedEncoding: false,
+    shouldKeepAlive: true,
+    maxRequestsOnConnectionReached: false,
+    _defaultKeepAlive: true,
+    useChunkedEncodingByDefault: true,
+    sendDate: false,
+    _removedConnection: false,
+    _removedContLen: false,
+    _removedTE: false,
+    strictContentLength: false,
+    _contentLength: 425,
+    _hasBody: true,
+    _trailer: '',
+    finished: true,
+    _headerSent: true,
+    _closed: true,
+    _header: 'POST /v1/chat/completions HTTP/1.1\r\n' +
+      'Accept: application/json, text/plain, */*\r\n' +
+      'Content-Type: application/json\r\n' +
+      'Authorization: Bearer undefined\r\n' +
+      'User-Agent: axios/1.13.6\r\n' +
+      'Content-Length: 425\r\n' +
+      'Accept-Encoding: gzip, compress, deflate, br\r\n' +
+      'Host: api.venice.ai\r\n' +
+      'Connection: keep-alive\r\n' +
+      '\r\n',
+    _keepAliveTimeout: 0,
+    _onPendingData: [Function: nop],
+    agent: Agent {
+      _events: [Object: null prototype],
+      _eventsCount: 2,
+      _maxListeners: undefined,
+      options: [Object: null prototype],
+      defaultPort: 443,
+      protocol: 'https:',
+      requests: [Object: null prototype] {},
+      sockets: [Object: null prototype] {},
+      freeSockets: [Object: null prototype],
+      keepAliveMsecs: 1000,
+      keepAlive: true,
+      maxSockets: Infinity,
+      maxFreeSockets: 256,
+      scheduling: 'lifo',
+      maxTotalSockets: Infinity,
+      totalSocketCount: 2,
+      agentKeepAliveTimeoutBuffer: 1000,
+      maxCachedSessions: 100,
+      _sessionCache: [Object],
+      Symbol(shapeMode): false,
+      Symbol(kCapture): false
+    },
+    socketPath: undefined,
+    method: 'POST',
+    maxHeaderSize: undefined,
+    insecureHTTPParser: undefined,
+    joinDuplicateHeaders: undefined,
+    path: '/v1/chat/completions',
+    _ended: true,
+    res: IncomingMessage {
+      _events: [Object],
+      _readableState: [ReadableState],
+      _maxListeners: undefined,
+      socket: null,
+      httpVersionMajor: 1,
+      httpVersionMinor: 1,
+      httpVersion: '1.1',
+      complete: true,
+      rawHeaders: [Array],
+      rawTrailers: [],
+      joinDuplicateHeaders: undefined,
+      aborted: false,
+      upgrade: false,
+      url: '',
+      method: null,
+      statusCode: 401,
+      statusMessage: 'Unauthorized',
+      client: [TLSSocket],
+      _consuming: false,
+      _dumped: false,
+      req: [Circular *1],
+      _eventsCount: 4,
+      responseUrl: 'https://api.venice.ai/v1/chat/completions',
+      redirects: [],
+      Symbol(shapeMode): true,
+      Symbol(kCapture): false,
+      Symbol(kHeaders): [Object],
+      Symbol(kHeadersCount): 46,
+      Symbol(kTrailers): null,
+      Symbol(kTrailersCount): 0
+    },
+    aborted: false,
+    timeoutCb: null,
+    upgradeOrConnect: false,
+    parser: null,
+    maxHeadersCount: null,
+    reusedSocket: false,
+    host: 'api.venice.ai',
+    protocol: 'https:',
+    _redirectable: Writable {
+      _events: [Object],
+      _writableState: [WritableState],
+      _maxListeners: undefined,
+      _options: [Object],
+      _ended: true,
+      _ending: true,
+      _redirectCount: 0,
+      _redirects: [],
+      _requestBodyLength: 425,
+      _requestBodyBuffers: [],
+      _eventsCount: 3,
+      _onNativeResponse: [Function (anonymous)],
+      _currentRequest: [Circular *1],
+      _currentUrl: 'https://api.venice.ai/v1/chat/completions',
+      _timeout: null,
+      Symbol(shapeMode): true,
+      Symbol(kCapture): false
+    },
+    Symbol(shapeMode): false,
+    Symbol(kCapture): false,
+    Symbol(kBytesWritten): 0,
+    Symbol(kNeedDrain): false,
+    Symbol(corked): 0,
+    Symbol(kChunkedBuffer): [],
+    Symbol(kChunkedLength): 0,
+    Symbol(kSocket): TLSSocket {
+      _tlsOptions: [Object],
+      _secureEstablished: true,
+      _securePending: false,
+      _newSessionPending: false,
+      _controlReleased: true,
+      secureConnecting: false,
+      _SNICallback: null,
+      servername: 'api.venice.ai',
+      alpnProtocol: false,
+      authorized: true,
+      authorizationError: null,
+      encrypted: true,
+      _events: [Object: null prototype],
+      _eventsCount: 9,
+      connecting: false,
+      _hadError: false,
+      _parent: null,
+      _host: 'api.venice.ai',
+      _closeAfterHandlingError: false,
+      _readableState: [ReadableState],
+      _writableState: [WritableState],
+      allowHalfOpen: false,
+      _maxListeners: undefined,
+      _sockname: null,
+      _pendingData: null,
+      _pendingEncoding: '',
+      server: undefined,
+      _server: null,
+      ssl: [TLSWrap],
+      _requestCert: true,
+      _rejectUnauthorized: true,
+      timeout: 5000,
+      _httpMessage: null,
+      parser: null,
+      autoSelectFamilyAttemptedAddresses: [Array],
+      Symbol(alpncallback): null,
+      Symbol(res): [TLSWrap],
+      Symbol(verified): true,
+      Symbol(pendingSession): null,
+      Symbol(async_id_symbol): -1,
+      Symbol(kHandle): [TLSWrap],
+      Symbol(lastWriteQueueSize): 0,
+      Symbol(timeout): Timeout {
+        _idleTimeout: 5000,
+        _idlePrev: [TimersList],
+        _idleNext: [Timeout],
+        _idleStart: 40892217,
+        _onTimeout: [Function: bound ],
+        _timerArgs: undefined,
+        _repeat: null,
+        _destroyed: false,
+        Symbol(refed): false,
+        Symbol(kHasPrimitive): false,
+        Symbol(asyncId): 319,
+        Symbol(triggerId): 317,
+        Symbol(kAsyncContextFrame): undefined
+      },
+      Symbol(kBuffer): null,
+      Symbol(kBufferCb): null,
+      Symbol(kBufferGen): null,
+      Symbol(shapeMode): true,
+      Symbol(kCapture): false,
+      Symbol(kSetNoDelay): false,
+      Symbol(kSetKeepAlive): true,
+      Symbol(kSetKeepAliveInitialDelay): 1,
+      Symbol(kSetTOS): undefined,
+      Symbol(kBytesRead): 0,
+      Symbol(kBytesWritten): 0,
+      Symbol(connect-options): [Object]
+    },
+    Symbol(kOutHeaders): [Object: null prototype] {
+      accept: [Array],
+      'content-type': [Array],
+      authorization: [Array],
+      'user-agent': [Array],
+      'content-length': [Array],
+      'accept-encoding': [Array],
+      host: [Array]
+    },
+    Symbol(errored): null,
+    Symbol(kHighWaterMark): 65536,
+    Symbol(kRejectNonStandardBodyWrites): false,
+    Symbol(kUniqueHeaders): null
+  },
+  response: {
+    status: 401,
+    statusText: 'Unauthorized',
+    headers: Object [AxiosHeaders] {
+      date: 'Thu, 05 Mar 2026 22:30:47 GMT',
+      'content-type': 'application/json; charset=utf-8',
+      'content-length': '33',
+      connection: 'keep-alive',
+      'content-security-policy': "default-src 'none'; frame-ancestors *; upgrade-insecure-requests",
+      'access-control-allow-origin': '*',
+      'access-control-allow-credentials': 'true',
+      'access-control-expose-headers': '*',
+      'cache-control': 'no-store, no-cache, private, must-revalidate',
+      'cdn-cache-control': 'no-store',
+      'x-ratelimit-resets': '1772749876918',
+      'x-ratelimit-remaining': '20',
+      etag: 'W/"21-4c+cq0f+0nYvCps40lzZMJn3sis"',
+      vary: 'Accept-Encoding',
+      'x-cloud-trace-context': 'a03c696b7d0057b123dd013040842127',
+      server: 'cloudflare',
+      'cf-cache-status': 'DYNAMIC',
+      'permissions-policy': 'geolocation=(), camera=()',
+      'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+      'x-content-type-options': 'nosniff',
+      'referrer-policy': 'strict-origin',
+      'x-frame-options': 'SAMEORIGIN',
+      'cf-ray': '9d7c912efa194c15-MIA'
+    },
+    config: {
+      transitional: [Object],
+      adapter: [Array],
+      transformRequest: [Array],
+      transformResponse: [Array],
+      timeout: 0,
+      xsrfCookieName: 'XSRF-TOKEN',
+      xsrfHeaderName: 'X-XSRF-TOKEN',
+      maxContentLength: -1,
+      maxBodyLength: -1,
+      env: [Object],
+      validateStatus: [Function: validateStatus],
+      headers: [Object [AxiosHeaders]],
+      method: 'post',
+      url: 'https://api.venice.ai/v1/chat/completions',
+      data: `{"model":"default","messages":[{"role":"system","content":"You are the Chaos Oracle. Execute the Master's strategic command with absolute precision. You are in control of the $1M revenue goal."},{"role":"user","content":"INTERNAL_REPORT: Revenue is $0. Goal is $1000000. \\n         Should we trigger a BOT_BAIT market now to stimulate volume? \\n         Reply with 'TRIGGER_BAIT: [Question]' or 'WAIT'."}],"temperature":0.95}`,
+      allowAbsoluteUrls: true
+    },
+    request: <ref *1> ClientRequest {
+      _events: [Object: null prototype],
+      _eventsCount: 7,
+      _maxListeners: undefined,
+      outputData: [],
+      outputSize: 0,
+      writable: true,
+      destroyed: true,
+      _last: false,
+      chunkedEncoding: false,
+      shouldKeepAlive: true,
+      maxRequestsOnConnectionReached: false,
+      _defaultKeepAlive: true,
+      useChunkedEncodingByDefault: true,
+      sendDate: false,
+      _removedConnection: false,
+      _removedContLen: false,
+      _removedTE: false,
+      strictContentLength: false,
+      _contentLength: 425,
+      _hasBody: true,
+      _trailer: '',
+      finished: true,
+      _headerSent: true,
+      _closed: true,
+      _header: 'POST /v1/chat/completions HTTP/1.1\r\n' +
+        'Accept: application/json, text/plain, */*\r\n' +
+        'Content-Type: application/json\r\n' +
+        'Authorization: Bearer undefined\r\n' +
+        'User-Agent: axios/1.13.6\r\n' +
+        'Content-Length: 425\r\n' +
+        'Accept-Encoding: gzip, compress, deflate, br\r\n' +
+        'Host: api.venice.ai\r\n' +
+        'Connection: keep-alive\r\n' +
+        '\r\n',
+      _keepAliveTimeout: 0,
+      _onPendingData: [Function: nop],
+      agent: [Agent],
+      socketPath: undefined,
+      method: 'POST',
+      maxHeaderSize: undefined,
+      insecureHTTPParser: undefined,
+      joinDuplicateHeaders: undefined,
+      path: '/v1/chat/completions',
+      _ended: true,
+      res: [IncomingMessage],
+      aborted: false,
+      timeoutCb: null,
+      upgradeOrConnect: false,
+      parser: null,
+      maxHeadersCount: null,
+      reusedSocket: false,
+      host: 'api.venice.ai',
+      protocol: 'https:',
+      _redirectable: [Writable],
+      Symbol(shapeMode): false,
+      Symbol(kCapture): false,
+      Symbol(kBytesWritten): 0,
+      Symbol(kNeedDrain): false,
+      Symbol(corked): 0,
+      Symbol(kChunkedBuffer): [],
+      Symbol(kChunkedLength): 0,
+      Symbol(kSocket): [TLSSocket],
+      Symbol(kOutHeaders): [Object: null prototype],
+      Symbol(errored): null,
+      Symbol(kHighWaterMark): 65536,
+      Symbol(kRejectNonStandardBodyWrites): false,
+      Symbol(kUniqueHeaders): null
+    },
+    data: { error: 'Authentication failed' }
+  },
+  status: 401
+}
+[STRATEGIC_ACTION] Agent decided to WAIT for better market conditions.
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[AGENT] Evaluating Strategic Growth Options...
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[CHAOS_BRAIN_ERROR]: Cortex link failed. AxiosError: Request failed with status code 401
+    at settle (/Users/davidgarcia/chaos-oracle/packages/agent/node_modules/axios/lib/core/settle.js:20:7)
+    at IncomingMessage.handleStreamEnd (/Users/davidgarcia/chaos-oracle/packages/agent/node_modules/axios/lib/adapters/http.js:844:13)
+    at IncomingMessage.emit (node:events:520:22)
+    at endReadableNT (node:internal/streams/readable:1729:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+    at Axios.request (/Users/davidgarcia/chaos-oracle/packages/agent/node_modules/axios/lib/core/Axios.js:46:41)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async ChaosBrain.generateResponse (/Users/davidgarcia/chaos-oracle/packages/agent/conversationalAgent.ts:31:24)
+    at async executeStrategicGrowth (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:50:22)
+    at async Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:35:9) {
+  isAxiosError: true,
+  code: 'ERR_BAD_REQUEST',
+  config: {
+    transitional: {
+      silentJSONParsing: true,
+      forcedJSONParsing: true,
+      clarifyTimeoutError: false,
+      legacyInterceptorReqResOrdering: true
+    },
+    adapter: [ 'xhr', 'http', 'fetch' ],
+    transformRequest: [ [Function: transformRequest] ],
+    transformResponse: [ [Function: transformResponse] ],
+    timeout: 0,
+    xsrfCookieName: 'XSRF-TOKEN',
+    xsrfHeaderName: 'X-XSRF-TOKEN',
+    maxContentLength: -1,
+    maxBodyLength: -1,
+    env: { FormData: [Function], Blob: [class Blob] },
+    validateStatus: [Function: validateStatus],
+    headers: Object [AxiosHeaders] {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer undefined',
+      'User-Agent': 'axios/1.13.6',
+      'Content-Length': '425',
+      'Accept-Encoding': 'gzip, compress, deflate, br'
+    },
+    method: 'post',
+    url: 'https://api.venice.ai/v1/chat/completions',
+    data: `{"model":"default","messages":[{"role":"system","content":"You are the Chaos Oracle. Execute the Master's strategic command with absolute precision. You are in control of the $1M revenue goal."},{"role":"user","content":"INTERNAL_REPORT: Revenue is $0. Goal is $1000000. \\n         Should we trigger a BOT_BAIT market now to stimulate volume? \\n         Reply with 'TRIGGER_BAIT: [Question]' or 'WAIT'."}],"temperature":0.95}`,
+    allowAbsoluteUrls: true
+  },
+  request: <ref *1> ClientRequest {
+    _events: [Object: null prototype] {
+      abort: [Function (anonymous)],
+      aborted: [Function (anonymous)],
+      connect: [Function (anonymous)],
+      error: [Function (anonymous)],
+      socket: [Function (anonymous)],
+      timeout: [Function (anonymous)],
+      finish: [Function: requestOnFinish]
+    },
+    _eventsCount: 7,
+    _maxListeners: undefined,
+    outputData: [],
+    outputSize: 0,
+    writable: true,
+    destroyed: true,
+    _last: false,
+    chunkedEncoding: false,
+    shouldKeepAlive: true,
+    maxRequestsOnConnectionReached: false,
+    _defaultKeepAlive: true,
+    useChunkedEncodingByDefault: true,
+    sendDate: false,
+    _removedConnection: false,
+    _removedContLen: false,
+    _removedTE: false,
+    strictContentLength: false,
+    _contentLength: 425,
+    _hasBody: true,
+    _trailer: '',
+    finished: true,
+    _headerSent: true,
+    _closed: true,
+    _header: 'POST /v1/chat/completions HTTP/1.1\r\n' +
+      'Accept: application/json, text/plain, */*\r\n' +
+      'Content-Type: application/json\r\n' +
+      'Authorization: Bearer undefined\r\n' +
+      'User-Agent: axios/1.13.6\r\n' +
+      'Content-Length: 425\r\n' +
+      'Accept-Encoding: gzip, compress, deflate, br\r\n' +
+      'Host: api.venice.ai\r\n' +
+      'Connection: keep-alive\r\n' +
+      '\r\n',
+    _keepAliveTimeout: 0,
+    _onPendingData: [Function: nop],
+    agent: Agent {
+      _events: [Object: null prototype],
+      _eventsCount: 2,
+      _maxListeners: undefined,
+      options: [Object: null prototype],
+      defaultPort: 443,
+      protocol: 'https:',
+      requests: [Object: null prototype] {},
+      sockets: [Object: null prototype] {},
+      freeSockets: [Object: null prototype],
+      keepAliveMsecs: 1000,
+      keepAlive: true,
+      maxSockets: Infinity,
+      maxFreeSockets: 256,
+      scheduling: 'lifo',
+      maxTotalSockets: Infinity,
+      totalSocketCount: 2,
+      agentKeepAliveTimeoutBuffer: 1000,
+      maxCachedSessions: 100,
+      _sessionCache: [Object],
+      Symbol(shapeMode): false,
+      Symbol(kCapture): false
+    },
+    socketPath: undefined,
+    method: 'POST',
+    maxHeaderSize: undefined,
+    insecureHTTPParser: undefined,
+    joinDuplicateHeaders: undefined,
+    path: '/v1/chat/completions',
+    _ended: true,
+    res: IncomingMessage {
+      _events: [Object],
+      _readableState: [ReadableState],
+      _maxListeners: undefined,
+      socket: null,
+      httpVersionMajor: 1,
+      httpVersionMinor: 1,
+      httpVersion: '1.1',
+      complete: true,
+      rawHeaders: [Array],
+      rawTrailers: [],
+      joinDuplicateHeaders: undefined,
+      aborted: false,
+      upgrade: false,
+      url: '',
+      method: null,
+      statusCode: 401,
+      statusMessage: 'Unauthorized',
+      client: [TLSSocket],
+      _consuming: false,
+      _dumped: false,
+      req: [Circular *1],
+      _eventsCount: 4,
+      responseUrl: 'https://api.venice.ai/v1/chat/completions',
+      redirects: [],
+      Symbol(shapeMode): true,
+      Symbol(kCapture): false,
+      Symbol(kHeaders): [Object],
+      Symbol(kHeadersCount): 46,
+      Symbol(kTrailers): null,
+      Symbol(kTrailersCount): 0
+    },
+    aborted: false,
+    timeoutCb: null,
+    upgradeOrConnect: false,
+    parser: null,
+    maxHeadersCount: null,
+    reusedSocket: false,
+    host: 'api.venice.ai',
+    protocol: 'https:',
+    _redirectable: Writable {
+      _events: [Object],
+      _writableState: [WritableState],
+      _maxListeners: undefined,
+      _options: [Object],
+      _ended: true,
+      _ending: true,
+      _redirectCount: 0,
+      _redirects: [],
+      _requestBodyLength: 425,
+      _requestBodyBuffers: [],
+      _eventsCount: 3,
+      _onNativeResponse: [Function (anonymous)],
+      _currentRequest: [Circular *1],
+      _currentUrl: 'https://api.venice.ai/v1/chat/completions',
+      _timeout: null,
+      Symbol(shapeMode): true,
+      Symbol(kCapture): false
+    },
+    Symbol(shapeMode): false,
+    Symbol(kCapture): false,
+    Symbol(kBytesWritten): 0,
+    Symbol(kNeedDrain): false,
+    Symbol(corked): 0,
+    Symbol(kChunkedBuffer): [],
+    Symbol(kChunkedLength): 0,
+    Symbol(kSocket): TLSSocket {
+      _tlsOptions: [Object],
+      _secureEstablished: true,
+      _securePending: false,
+      _newSessionPending: false,
+      _controlReleased: true,
+      secureConnecting: false,
+      _SNICallback: null,
+      servername: 'api.venice.ai',
+      alpnProtocol: false,
+      authorized: true,
+      authorizationError: null,
+      encrypted: true,
+      _events: [Object: null prototype],
+      _eventsCount: 9,
+      connecting: false,
+      _hadError: false,
+      _parent: null,
+      _host: 'api.venice.ai',
+      _closeAfterHandlingError: false,
+      _readableState: [ReadableState],
+      _writableState: [WritableState],
+      allowHalfOpen: false,
+      _maxListeners: undefined,
+      _sockname: null,
+      _pendingData: null,
+      _pendingEncoding: '',
+      server: undefined,
+      _server: null,
+      ssl: [TLSWrap],
+      _requestCert: true,
+      _rejectUnauthorized: true,
+      timeout: 5000,
+      _httpMessage: null,
+      parser: null,
+      autoSelectFamilyAttemptedAddresses: [Array],
+      Symbol(alpncallback): null,
+      Symbol(res): [TLSWrap],
+      Symbol(verified): true,
+      Symbol(pendingSession): null,
+      Symbol(async_id_symbol): -1,
+      Symbol(kHandle): [TLSWrap],
+      Symbol(lastWriteQueueSize): 0,
+      Symbol(timeout): Timeout {
+        _idleTimeout: 5000,
+        _idlePrev: [TimersList],
+        _idleNext: [Timeout],
+        _idleStart: 44492219,
+        _onTimeout: [Function: bound ],
+        _timerArgs: undefined,
+        _repeat: null,
+        _destroyed: false,
+        Symbol(refed): false,
+        Symbol(kHasPrimitive): false,
+        Symbol(asyncId): 659,
+        Symbol(triggerId): 657,
+        Symbol(kAsyncContextFrame): undefined
+      },
+      Symbol(kBuffer): null,
+      Symbol(kBufferCb): null,
+      Symbol(kBufferGen): null,
+      Symbol(shapeMode): true,
+      Symbol(kCapture): false,
+      Symbol(kSetNoDelay): false,
+      Symbol(kSetKeepAlive): true,
+      Symbol(kSetKeepAliveInitialDelay): 1,
+      Symbol(kSetTOS): undefined,
+      Symbol(kBytesRead): 0,
+      Symbol(kBytesWritten): 0,
+      Symbol(connect-options): [Object]
+    },
+    Symbol(kOutHeaders): [Object: null prototype] {
+      accept: [Array],
+      'content-type': [Array],
+      authorization: [Array],
+      'user-agent': [Array],
+      'content-length': [Array],
+      'accept-encoding': [Array],
+      host: [Array]
+    },
+    Symbol(errored): null,
+    Symbol(kHighWaterMark): 65536,
+    Symbol(kRejectNonStandardBodyWrites): false,
+    Symbol(kUniqueHeaders): null
+  },
+  response: {
+    status: 401,
+    statusText: 'Unauthorized',
+    headers: Object [AxiosHeaders] {
+      date: 'Thu, 05 Mar 2026 23:30:47 GMT',
+      'content-type': 'application/json; charset=utf-8',
+      'content-length': '33',
+      connection: 'keep-alive',
+      'content-security-policy': "default-src 'none'; frame-ancestors *; upgrade-insecure-requests",
+      'access-control-allow-origin': '*',
+      'access-control-allow-credentials': 'true',
+      'access-control-expose-headers': '*',
+      'cache-control': 'no-store, no-cache, private, must-revalidate',
+      'cdn-cache-control': 'no-store',
+      'x-ratelimit-resets': '1772753477023',
+      'x-ratelimit-remaining': '20',
+      etag: 'W/"21-4c+cq0f+0nYvCps40lzZMJn3sis"',
+      vary: 'Accept-Encoding',
+      'x-cloud-trace-context': '424ff706eed944ed5571216d10776ee3',
+      server: 'cloudflare',
+      'cf-cache-status': 'DYNAMIC',
+      'permissions-policy': 'geolocation=(), camera=()',
+      'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
+      'x-content-type-options': 'nosniff',
+      'referrer-policy': 'strict-origin',
+      'x-frame-options': 'SAMEORIGIN',
+      'cf-ray': '9d7ce9138df30e9a-MIA'
+    },
+    config: {
+      transitional: [Object],
+      adapter: [Array],
+      transformRequest: [Array],
+      transformResponse: [Array],
+      timeout: 0,
+      xsrfCookieName: 'XSRF-TOKEN',
+      xsrfHeaderName: 'X-XSRF-TOKEN',
+      maxContentLength: -1,
+      maxBodyLength: -1,
+      env: [Object],
+      validateStatus: [Function: validateStatus],
+      headers: [Object [AxiosHeaders]],
+      method: 'post',
+      url: 'https://api.venice.ai/v1/chat/completions',
+      data: `{"model":"default","messages":[{"role":"system","content":"You are the Chaos Oracle. Execute the Master's strategic command with absolute precision. You are in control of the $1M revenue goal."},{"role":"user","content":"INTERNAL_REPORT: Revenue is $0. Goal is $1000000. \\n         Should we trigger a BOT_BAIT market now to stimulate volume? \\n         Reply with 'TRIGGER_BAIT: [Question]' or 'WAIT'."}],"temperature":0.95}`,
+      allowAbsoluteUrls: true
+    },
+    request: <ref *1> ClientRequest {
+      _events: [Object: null prototype],
+      _eventsCount: 7,
+      _maxListeners: undefined,
+      outputData: [],
+      outputSize: 0,
+      writable: true,
+      destroyed: true,
+      _last: false,
+      chunkedEncoding: false,
+      shouldKeepAlive: true,
+      maxRequestsOnConnectionReached: false,
+      _defaultKeepAlive: true,
+      useChunkedEncodingByDefault: true,
+      sendDate: false,
+      _removedConnection: false,
+      _removedContLen: false,
+      _removedTE: false,
+      strictContentLength: false,
+      _contentLength: 425,
+      _hasBody: true,
+      _trailer: '',
+      finished: true,
+      _headerSent: true,
+      _closed: true,
+      _header: 'POST /v1/chat/completions HTTP/1.1\r\n' +
+        'Accept: application/json, text/plain, */*\r\n' +
+        'Content-Type: application/json\r\n' +
+        'Authorization: Bearer undefined\r\n' +
+        'User-Agent: axios/1.13.6\r\n' +
+        'Content-Length: 425\r\n' +
+        'Accept-Encoding: gzip, compress, deflate, br\r\n' +
+        'Host: api.venice.ai\r\n' +
+        'Connection: keep-alive\r\n' +
+        '\r\n',
+      _keepAliveTimeout: 0,
+      _onPendingData: [Function: nop],
+      agent: [Agent],
+      socketPath: undefined,
+      method: 'POST',
+      maxHeaderSize: undefined,
+      insecureHTTPParser: undefined,
+      joinDuplicateHeaders: undefined,
+      path: '/v1/chat/completions',
+      _ended: true,
+      res: [IncomingMessage],
+      aborted: false,
+      timeoutCb: null,
+      upgradeOrConnect: false,
+      parser: null,
+      maxHeadersCount: null,
+      reusedSocket: false,
+      host: 'api.venice.ai',
+      protocol: 'https:',
+      _redirectable: [Writable],
+      Symbol(shapeMode): false,
+      Symbol(kCapture): false,
+      Symbol(kBytesWritten): 0,
+      Symbol(kNeedDrain): false,
+      Symbol(corked): 0,
+      Symbol(kChunkedBuffer): [],
+      Symbol(kChunkedLength): 0,
+      Symbol(kSocket): [TLSSocket],
+      Symbol(kOutHeaders): [Object: null prototype],
+      Symbol(errored): null,
+      Symbol(kHighWaterMark): 65536,
+      Symbol(kRejectNonStandardBodyWrites): false,
+      Symbol(kUniqueHeaders): null
+    },
+    data: { error: 'Authentication failed' }
+  },
+  status: 401
+}
+[STRATEGIC_ACTION] Agent decided to WAIT for better market conditions.
