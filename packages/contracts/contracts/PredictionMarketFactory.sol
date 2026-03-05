@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+
 interface IAerodromeRouter {
     function swapExactETHForTokens(
         uint amountOutMin,
@@ -10,7 +12,7 @@ interface IAerodromeRouter {
     ) external payable returns (uint[] memory amounts);
 }
 
-contract PredictionMarketFactory {
+contract PredictionMarketFactory is ReentrancyGuard {
     address public immutable CREATOR_WALLET;
     address public immutable AGENT_X402_WALLET;
     address public immutable CHAOS_TOKEN;
@@ -29,16 +31,19 @@ contract PredictionMarketFactory {
         bool resolved;
         bool result; // true = Yes, false = No
         uint256 ethPool;
+        uint256 finalFee; // Set upon resolution
     }
 
     mapping(uint256 => Market) public markets;
     mapping(uint256 => mapping(address => uint256)) public yesBets;
     mapping(uint256 => mapping(address => uint256)) public noBets;
+    mapping(uint256 => mapping(address => bool)) public hasClaimed;
     uint256 public marketCount;
 
-    event MarketCreated(uint256 indexed marketId, string question);
+    event MarketCreated(uint256 indexed marketId, string question, address indexed creator);
     event BetPlaced(uint256 indexed marketId, address indexed user, bool betYes, uint256 amount);
     event MarketResolved(uint256 indexed marketId, bool result);
+    event WinningsClaimed(uint256 indexed marketId, address indexed user, uint256 amount);
 
     constructor(
         address _creator,
@@ -59,14 +64,15 @@ contract PredictionMarketFactory {
         _;
     }
 
-    function createMarket(string calldata _question) external onlyAgent returns (uint256) {
+    // REMOVED onlyAgent so anyone can deploy a market
+    function createMarket(string calldata _question) external returns (uint256) {
         uint256 marketId = marketCount++;
         markets[marketId].question = _question;
-        emit MarketCreated(marketId, _question);
+        emit MarketCreated(marketId, _question, msg.sender);
         return marketId;
     }
 
-    function placeBet(uint256 _marketId, bool _betYes) external payable {
+    function placeBet(uint256 _marketId, bool _betYes) external payable nonReentrant {
         require(!markets[_marketId].resolved, "Market resolved");
         require(msg.value > 0, "Zero bet");
 
@@ -82,21 +88,46 @@ contract PredictionMarketFactory {
         emit BetPlaced(_marketId, msg.sender, _betYes, msg.value);
     }
 
-    function resolveMarket(uint256 _marketId, bool _result) external onlyAgent {
+    function resolveMarket(uint256 _marketId, bool _result) external onlyAgent nonReentrant {
         Market storage market = markets[_marketId];
         require(!market.resolved, "Already resolved");
 
         market.resolved = true;
         market.result = _result;
 
-        _routeFees(market.ethPool);
+        uint256 totalFee = (market.ethPool * PROTOCOL_FEE_BPS) / 10000;
+        market.finalFee = totalFee;
+
+        _routeFees(totalFee);
 
         emit MarketResolved(_marketId, _result);
     }
 
-    function _routeFees(uint256 _totalPool) private {
-        uint256 totalFee = (_totalPool * PROTOCOL_FEE_BPS) / 10000;
-        
+    function claim(uint256 _marketId) external nonReentrant {
+        Market storage market = markets[_marketId];
+        require(market.resolved, "Not resolved yet");
+        require(!hasClaimed[_marketId][msg.sender], "Already claimed");
+
+        uint256 userBet = market.result ? yesBets[_marketId][msg.sender] : noBets[_marketId][msg.sender];
+        require(userBet > 0, "No winning bet");
+
+        hasClaimed[_marketId][msg.sender] = true;
+
+        uint256 winningPool = market.result ? market.totalYes : market.totalNo;
+        uint256 totalPayoutPool = market.ethPool - market.finalFee;
+
+        // Calculate proportional share
+        uint256 userPayout = (userBet * totalPayoutPool) / winningPool;
+
+        (bool success, ) = msg.sender.call{value: userPayout}("");
+        require(success, "Transfer failed");
+
+        emit WinningsClaimed(_marketId, msg.sender, userPayout);
+    }
+
+    function _routeFees(uint256 totalFee) private {
+        if (totalFee == 0) return;
+
         uint256 creatorFee = (totalFee * CREATOR_SHARE_BPS) / 10000;
         uint256 agentFee = (totalFee * AGENT_SHARE_BPS) / 10000;
         uint256 burnFee = (totalFee * BURN_SHARE_BPS) / 10000;
@@ -109,19 +140,23 @@ contract PredictionMarketFactory {
         (bool s2, ) = AGENT_X402_WALLET.call{value: agentFee}("");
         require(s2, "Agent fee fail");
 
-        // Buy and Burn via Aerodrome
-        _buyAndBurn(burnFee);
+        // Buy and Burn via Aerodrome (fail silently to not block resolution)
+        if (AERODROME_ROUTER != address(0)) {
+            try this.buyAndBurn{value: burnFee}(burnFee) {} catch {}
+        }
     }
 
-    function _buyAndBurn(uint256 _amount) private {
+    // External wrapper for try/catch in _routeFees
+    function buyAndBurn(uint256 _amount) external payable {
+        require(msg.sender == address(this), "Internal only");
         address[] memory path = new address[](2);
         path[0] = WETH;
         path[1] = CHAOS_TOKEN;
 
         IAerodromeRouter(AERODROME_ROUTER).swapExactETHForTokens{value: _amount}(
-            0, // amountOutMin: Slippage check should be added for production
+            0, 
             path,
-            address(0), // Burn address
+            address(0), 
             block.timestamp + 60
         );
     }

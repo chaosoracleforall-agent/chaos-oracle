@@ -12,6 +12,7 @@
     "alchemy-sdk": "latest",
     "dotenv": "latest",
     "ts-node": "latest",
-    "typescript": "latest"
+    "typescript": "latest",
+    "twitter-api-v2": "latest"
   }
 }
