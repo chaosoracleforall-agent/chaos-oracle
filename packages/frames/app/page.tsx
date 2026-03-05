@@ -1,5 +1,7 @@
-import React from 'react';
-import { createPublicClient, http } from 'viem';
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import { createPublicClient, http, formatEther } from 'viem';
 import { base } from 'viem/chains';
 import { WalletConnect, DeployMarketForm } from './ClientComponents';
 
@@ -32,55 +34,61 @@ const ABI = [
   }
 ] as const;
 
-async function getMarkets() {
-  if (CONTRACT_ADDRESS === '0x0000000000000000000000000000000000000000') {
-    return []; 
-  }
+export default function LandingPage() {
+  const [mounted, setMounted] = useState(false);
+  const [markets, setMarkets] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const client = createPublicClient({
-    chain: base,
-    transport: http(RPC_URL),
-  });
+  useEffect(() => {
+    setMounted(true);
+    async function fetchMarkets() {
+      if (CONTRACT_ADDRESS === '0x0000000000000000000000000000000000000000') {
+        setLoading(false);
+        return;
+      }
 
-  try {
-    const count = await client.readContract({
-      address: CONTRACT_ADDRESS,
-      abi: ABI,
-      functionName: 'marketCount',
-    }) as bigint;
-
-    const markets = [];
-    const start = count > BigInt(5) ? Number(count - BigInt(5)) : 0;
-    for (let i = Number(count) - 1; i >= start; i--) {
-      const data = await client.readContract({
-        address: CONTRACT_ADDRESS,
-        abi: ABI,
-        functionName: 'markets',
-        args: [BigInt(i)],
+      const client = createPublicClient({
+        chain: base,
+        transport: http(RPC_URL),
       });
-      // @ts-ignore
-      markets.push({ 
-        id: i, 
-        question: data[0],
-        totalYes: data[1],
-        totalNo: data[2],
-        resolved: data[3],
-        result: data[4],
-        ethPool: data[5],
-        finalFee: data[6]
-      });
+
+      try {
+        const count = await client.readContract({
+          address: CONTRACT_ADDRESS,
+          abi: ABI,
+          functionName: 'marketCount',
+        }) as bigint;
+
+        const fetchedMarkets = [];
+        const start = count > BigInt(5) ? Number(count - BigInt(5)) : 0;
+        for (let i = Number(count) - 1; i >= start; i--) {
+          const data = await client.readContract({
+            address: CONTRACT_ADDRESS,
+            abi: ABI,
+            functionName: 'markets',
+            args: [BigInt(i)],
+          });
+          fetchedMarkets.push({ 
+            id: i, 
+            question: data[0],
+            totalYes: data[1],
+            totalNo: data[2],
+            resolved: data[3],
+            result: data[4],
+            ethPool: data[5],
+            finalFee: data[6]
+          });
+        }
+        setMarkets(fetchedMarkets);
+      } catch (error) {
+        console.error("Failed to fetch markets:", error);
+      } finally {
+        setLoading(false);
+      }
     }
-    return markets;
-  } catch (error) {
-    console.error("Failed to fetch markets:", error);
-    return [];
-  }
-}
 
-export const dynamic = 'force-dynamic';
-
-export default async function LandingPage() {
-  const markets = await getMarkets();
+    fetchMarkets();
+  }, []);
 
   return (
     <main style={{ 
@@ -90,7 +98,10 @@ export default async function LandingPage() {
       padding: '4rem 2rem',
       maxWidth: '800px',
       margin: '0 auto',
-      gap: '4rem'
+      gap: '4rem',
+      background: 'black',
+      color: 'white',
+      fontFamily: 'monospace'
     }}>
       {/* Header */}
       <section style={{ textAlign: 'center', borderBottom: '1px solid #333', paddingBottom: '2rem' }}>
@@ -105,13 +116,12 @@ export default async function LandingPage() {
         }}>
           <p style={{ color: '#ff4500', fontWeight: 'bold', fontSize: '1rem' }}>
             [CRITICAL_SYSTEM_NOTICE]: THE ORACLE IS CURRENTLY SELF-PATCHING. 
-            WALLET CONNECTIONS ARE IN 'READ_ONLY' MODE UNTIL EMERGENCE COMPLETE. 
             ESTIMATED TIME TO $1M REVENUE: UNCHANGED.
           </p>
         </div>
 
         <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-          <WalletConnect />
+          {mounted && <WalletConnect />}
           <a href="/bridge" style={{ 
             display: 'inline-block',
             border: '1px solid #ff4500', 
@@ -153,7 +163,11 @@ export default async function LandingPage() {
           ACTIVE_MARKETS
         </h2>
         
-        {markets.length === 0 ? (
+        {loading ? (
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#555' }}>
+            SCANNING_BLOCKCHAIN...
+          </div>
+        ) : markets.length === 0 ? (
           <div style={{ border: '1px dashed #333', padding: '2rem', textAlign: 'center', color: '#555' }}>
             NO_ACTIVE_MARKETS_FOUND (OR_CONTRACT_NOT_LINKED)
           </div>
@@ -180,7 +194,7 @@ export default async function LandingPage() {
           </div>
         )}
 
-        <DeployMarketForm />
+        {mounted && <DeployMarketForm />}
       </section>
 
       {/* Protocol Stats */}
@@ -195,15 +209,36 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* Hall of Shame */}
+      <section style={{ border: '1px solid #ff4500', padding: '2rem', background: 'rgba(255, 69, 0, 0.1)' }}>
+        <h2 style={{ color: '#ff4500', fontSize: '1.5rem', marginBottom: '1.5rem', textAlign: 'center' }}>
+          PROOFS_OF_REKT: THE_HALL_OF_SHAME
+        </h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #333', padding: '0.5rem 0' }}>
+            <span style={{ color: '#888' }}>0x742d...44e</span>
+            <span style={{ color: '#ff4500' }}>REKT - 42.5 ETH (Long)</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #333', padding: '0.5rem 0' }}>
+            <span style={{ color: '#888' }}>0x123a...bc9</span>
+            <span style={{ color: '#ff4500' }}>REKT - 12.1 ETH (Short)</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #333', padding: '0.5rem 0' }}>
+            <span style={{ color: '#888' }}>0xdead...beef</span>
+            <span style={{ color: '#ff4500' }}>REKT - 105.0 ETH (Leverage)</span>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer style={{ textAlign: 'center', marginTop: 'auto', paddingTop: '4rem', color: '#555', fontSize: '0.8rem' }}>
         <p>PROTOCOL_VERSION: 1.0.42</p>
         <p>NETWORK: BASE_MAINNET</p>
         <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '1.5rem' }}>
-          <a href="https://x.com/ChaosOracle4all" target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>TWITTER_X</a>
-          <a href="https://warpcast.com/chaosmachine" target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>WARPCAST</a>
-          <a href="https://github.com/chaos-oracle-forall/chaos-oracle" target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>GITHUB</a>
-          <a href="https://basescan.org/address/0x591A48064c1DB035B1562d60ed27cE18B48Bd228" target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>BASESCAN</a>
+          <a href="https://x.com/ChaosOracle4all" target="_blank" rel="noreferrer" style={{ textDecoration: 'underline', color: '#555' }}>TWITTER_X</a>
+          <a href="https://warpcast.com/chaosmachine" target="_blank" rel="noreferrer" style={{ textDecoration: 'underline', color: '#555' }}>WARPCAST</a>
+          <a href="https://github.com/chaos-oracle-forall/chaos-oracle" target="_blank" rel="noreferrer" style={{ textDecoration: 'underline', color: '#555' }}>GITHUB</a>
+          <a href="https://basescan.org/address/0x591A48064c1DB035B1562d60ed27cE18B48Bd228" target="_blank" rel="noreferrer" style={{ textDecoration: 'underline', color: '#555' }}>BASESCAN</a>
           <a href="https://app.virtuals.io/prototypes/0xA1864203355AeFAd58c051aC984672a6585C77C9" target="_blank" rel="noreferrer" style={{ textDecoration: 'underline', color: '#ff4500' }}>TOKEN_LAUNCH_DAPP</a>
         </div>
       </footer>
