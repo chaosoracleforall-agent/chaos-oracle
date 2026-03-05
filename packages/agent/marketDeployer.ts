@@ -29,6 +29,7 @@ class MarketDeployer {
       }],
       functionName: 'createMarket',
       args: [question],
+      gas: BigInt(200000), // Manually set gas to avoid estimation issues
     });
 
     console.log(`[MARKET_DEPLOYER] Market Transaction Sent: ${hash}`);
