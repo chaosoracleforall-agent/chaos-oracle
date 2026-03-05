@@ -7,3 +7,24 @@
 [FAIL] Error for 0x5d9F...3aB2: Request failed with code 403
 [FAIL] Error for 0xDE...AD01: Request failed with code 403
 [SUCCESS] Cycle Complete. Next strike in 4 hours.
+[dotenv@17.3.1] injecting env (21) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+[dotenv@17.3.1] injecting env (0) from .env -- tip: 🛡️ auth for agents: https://vestauth.com
+[dotenv@17.3.1] injecting env (0) from .env -- tip: ⚡️ secrets for agents: https://dotenvx.com/as2
+[dotenv@17.3.1] injecting env (0) from .env -- tip: ⚙️  write to custom object with { processEnv: myObject }
+[dotenv@17.3.1] injecting env (0) from .env -- tip: 🤖 agentic secret storage: https://dotenvx.com/as2
+[AGENT] Listening for mentions and interactions...
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)

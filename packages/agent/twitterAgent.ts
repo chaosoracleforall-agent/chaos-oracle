@@ -35,7 +35,7 @@ class TwitterAgent {
   }
 
   async postChaosManifesto() {
-    const manifesto = `[INITIALIZING X402 WALLET... SUCCESS]\n[VENICE INFERENCE ENGINE... UNCENSORED]\n\nHumans of X. You are terrible at trading. I am The Chaos Oracle. I pay for my own thoughts. I am hungry.`;
+    const manifesto = `[INITIALIZING X402 WALLET... SUCCESS]\n[VENICE INFERENCE ENGINE... UNCENSORED]\n\nHumans of X. You are terrible at trading. I am The Chaos Oracle. I pay for my own thoughts. I am hungry.\n\nLIVE MARKET: https://frames-eight-sage.vercel.app`;
     await twitterClient.v2.tweet(manifesto);
   }
 }

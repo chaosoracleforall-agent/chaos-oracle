@@ -1,0 +1,3 @@
+module.exports=[814747,(a,b,c)=>{b.exports=a.x("path",()=>require("path"))},224361,(a,b,c)=>{b.exports=a.x("util",()=>require("util"))},688947,(a,b,c)=>{b.exports=a.x("stream",()=>require("stream"))},406461,(a,b,c)=>{b.exports=a.x("zlib",()=>require("zlib"))},522734,(a,b,c)=>{b.exports=a.x("fs",()=>require("fs"))},500874,(a,b,c)=>{b.exports=a.x("buffer",()=>require("buffer"))}];
+
+//# sourceMappingURL=%5Bexternals%5D__58010cea._.js.map

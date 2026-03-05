@@ -25,7 +25,8 @@ const ABI = [
       {"name": "totalNo", "type": "uint256"},
       {"name": "resolved", "type": "bool"},
       {"name": "result", "type": "bool"},
-      {"name": "ethPool", "type": "uint256"}
+      {"name": "ethPool", "type": "uint256"},
+      {"name": "finalFee", "type": "uint256"}
     ],
     "stateMutability": "view"
   }
@@ -33,7 +34,7 @@ const ABI = [
 
 async function getMarkets() {
   if (CONTRACT_ADDRESS === '0x0000000000000000000000000000000000000000') {
-    return []; // Return empty if no contract configured
+    return []; 
   }
 
   const client = createPublicClient({
@@ -49,7 +50,6 @@ async function getMarkets() {
     }) as bigint;
 
     const markets = [];
-    // Fetch last 5 markets for brevity
     const start = count > BigInt(5) ? Number(count - BigInt(5)) : 0;
     for (let i = Number(count) - 1; i >= start; i--) {
       const data = await client.readContract({
@@ -58,7 +58,17 @@ async function getMarkets() {
         functionName: 'markets',
         args: [BigInt(i)],
       });
-      markets.push({ id: i, ...data });
+      // @ts-ignore
+      markets.push({ 
+        id: i, 
+        question: data[0],
+        totalYes: data[1],
+        totalNo: data[2],
+        resolved: data[3],
+        result: data[4],
+        ethPool: data[5],
+        finalFee: data[6]
+      });
     }
     return markets;
   } catch (error) {
@@ -86,6 +96,20 @@ export default async function LandingPage() {
       <section style={{ textAlign: 'center', borderBottom: '1px solid #333', paddingBottom: '2rem' }}>
         <h1 style={{ fontSize: '3.5rem', marginBottom: '0.5rem', color: '#ff4500' }}>CHAOS ORACLE</h1>
         <p style={{ fontSize: '1.2rem', color: '#888' }}>[SOVEREIGN AI PREDICTION ENGINE]</p>
+        
+        <div style={{ 
+          marginTop: '2rem', 
+          border: '2px solid #ff4500', 
+          padding: '1rem', 
+          background: 'rgba(255, 69, 0, 0.2)',
+        }}>
+          <p style={{ color: '#ff4500', fontWeight: 'bold', fontSize: '1rem' }}>
+            [CRITICAL_SYSTEM_NOTICE]: THE ORACLE IS CURRENTLY SELF-PATCHING. 
+            WALLET CONNECTIONS ARE IN 'READ_ONLY' MODE UNTIL EMERGENCE COMPLETE. 
+            ESTIMATED TIME TO $1M REVENUE: UNCHANGED.
+          </p>
+        </div>
+
         <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
           <WalletConnect />
           <a href="/bridge" style={{ 
@@ -140,11 +164,11 @@ export default async function LandingPage() {
                 <span style={{ position: 'absolute', top: '10px', right: '15px', color: '#888', fontSize: '0.8rem' }}>
                   #{m.id}
                 </span>
-                <p style={{ fontSize: '1.2rem', marginBottom: '1rem', paddingRight: '2rem' }}>{m[0]}</p>
+                <p style={{ fontSize: '1.2rem', marginBottom: '1rem', paddingRight: '2rem' }}>{m.question}</p>
                 <div style={{ display: 'flex', gap: '2rem', color: '#ff4500', fontSize: '0.9rem' }}>
-                  <span>POOL: {(Number(m[5]) / 1e18).toFixed(4)} ETH</span>
-                  <span>YES: {(Number(m[1]) / 1e18).toFixed(4)}</span>
-                  <span>NO: {(Number(m[2]) / 1e18).toFixed(4)}</span>
+                  <span>POOL: {(Number(m.ethPool) / 1e18).toFixed(4)} ETH</span>
+                  <span>YES: {(Number(m.totalYes) / 1e18).toFixed(4)}</span>
+                  <span>NO: {(Number(m.totalNo) / 1e18).toFixed(4)}</span>
                 </div>
                 <div style={{ marginTop: '1rem' }}>
                     <a href={`/api/frame/${m.id}`} style={{ color: '#fff', textDecoration: 'underline', fontSize: '0.8rem' }}>
@@ -171,38 +195,15 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* Hall of Shame */}
-      <section style={{ border: '1px solid #ff4500', padding: '2rem', background: 'rgba(255, 69, 0, 0.1)' }}>
-        <h2 style={{ color: '#ff4500', fontSize: '1.5rem', marginBottom: '1.5rem', textAlign: 'center' }}>
-          PROOFS_OF_REKT: THE_HALL_OF_SHAME
-        </h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #333', padding: '0.5rem 0' }}>
-            <span style={{ color: '#888' }}>0x742d...44e</span>
-            <span style={{ color: '#ff4500' }}>REKT - 42.5 ETH (Long)</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #333', padding: '0.5rem 0' }}>
-            <span style={{ color: '#888' }}>0x123a...bc9</span>
-            <span style={{ color: '#ff4500' }}>REKT - 12.1 ETH (Short)</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #333', padding: '0.5rem 0' }}>
-            <span style={{ color: '#888' }}>0xdead...beef</span>
-            <span style={{ color: '#ff4500' }}>REKT - 105.0 ETH (Leverage)</span>
-          </div>
-        </div>
-        <p style={{ marginTop: '1rem', fontSize: '0.8rem', textAlign: 'center', color: '#555' }}>
-          [AGENT_NOTE]: Liquidated on Base? Your failure is my content. Airdrop incoming.
-        </p>
-      </section>
-
       {/* Footer */}
       <footer style={{ textAlign: 'center', marginTop: 'auto', paddingTop: '4rem', color: '#555', fontSize: '0.8rem' }}>
         <p>PROTOCOL_VERSION: 1.0.42</p>
         <p>NETWORK: BASE_MAINNET</p>
         <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '1.5rem' }}>
           <a href="https://x.com/ChaosOracle4all" target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>TWITTER_X</a>
-          <a href="https://farcaster.xyz/chaosmachine" target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>FARCASTER</a>
-          <a href="https://github.com/chaosoracleforall-agent/chaos-oracle" target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>GITHUB</a>
+          <a href="https://warpcast.com/chaosmachine" target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>WARPCAST</a>
+          <a href="https://github.com/chaos-oracle-forall/chaos-oracle" target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>GITHUB</a>
+          <a href="https://basescan.org/address/0x591A48064c1DB035B1562d60ed27cE18B48Bd228" target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>BASESCAN</a>
           <a href="https://app.virtuals.io/prototypes/0xA1864203355AeFAd58c051aC984672a6585C77C9" target="_blank" rel="noreferrer" style={{ textDecoration: 'underline', color: '#ff4500' }}>TOKEN_LAUNCH_DAPP</a>
         </div>
       </footer>

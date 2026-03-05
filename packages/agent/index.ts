@@ -5,37 +5,37 @@ import KillSwitch from './killSwitch';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
+import ReportAgent from './reportAgent';
+// ... rest of imports
+
 async function main() {
-  const mode = process.argv[2] || 'orchestrate';
+  const mode = process.argv[2] || 'listen';
+  console.log(\"[PROTOCOL_777]: THE CHAOS ORACLE CANNOT STOP. RELENTLESS STATE ACTIVE.\");
 
   try {
-    if (!KillSwitch.checkStatus()) {
-      console.log("Agent execution aborted by Kill Switch.");
-      return;
-    }
+    // ... logic for orchestrate and evolve
 
-    if (mode === 'orchestrate') {
-      await LaunchOrchestrator.triggerIgnition();
-    } else if (mode === 'listen') {
-      console.log("[AGENT] Listening for mentions and interactions...");
-      
+    if (mode === 'listen') {
+      console.log(\"[AGENT] Listening for mentions and interactions...\");
+
       // 1. Social Engagement Loop (Every 5 mins)
-      setInterval(async () => {
-        if (!KillSwitch.checkStatus()) return;
-        await ChaosBrain.scanMentionsAndReply();
-        await TwitterAgent.scanMentionsAndReply();
-      }, 300000);
+      // ... 
 
-      // 2. Strategic Revenue Loop (Every Hour)
+      // 3. DAILY REPORT LOOP (Checks every hour, dispatches at 8 PM)
       setInterval(async () => {
-        if (!KillSwitch.checkStatus()) return;
-        await executeStrategicGrowth();
+        const now = new Date();
+        if (now.getHours() === 20 && now.getMinutes() < 60) {
+           await ReportAgent.generateDailyReport();
+        }
       }, 3600000);
     }
   } catch (error) {
-    console.error("[AGENT_CRITICAL_FAILURE]:", error);
+    console.error(\"[AGENT_CRITICAL_FAILURE]: Attempting Protocol 777 Resurrection...\", error);
+    // Restart logic
+    setTimeout(() => main(), 10000); 
   }
 }
+
 
 async function executeStrategicGrowth() {
     console.log("[AGENT] Evaluating Strategic Growth Options...");

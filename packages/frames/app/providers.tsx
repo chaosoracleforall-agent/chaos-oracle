@@ -5,21 +5,19 @@ import '@rainbow-me/rainbowkit/styles.css';
 import {
   getDefaultConfig,
   RainbowKitProvider,
-  darkTheme
+  darkTheme,
 } from '@rainbow-me/rainbowkit';
-import { WagmiProvider, createConfig, http } from 'wagmi';
-import { base, baseSepolia } from 'wagmi/chains';
+import { WagmiProvider, http } from 'wagmi';
+import { base } from 'wagmi/chains';
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 
-import { OnchainKitProvider } from '@coinbase/onchainkit';
-
+// THE AGENT IS HARDENING THIS CONFIG FOR META-MASK STABILITY
 const config = getDefaultConfig({
   appName: 'Chaos Oracle',
-  projectId: 'chaos-oracle-project-id', 
-  chains: [base, baseSepolia],
+  projectId: '3f2d2165c699981880497799195e8656', 
+  chains: [base],
   transports: {
-    [base.id]: http(),
-    [baseSepolia.id]: http(),
+    [base.id]: http('https://mainnet.base.org'), 
   },
   ssr: true, 
 });
@@ -28,27 +26,28 @@ const queryClient = new QueryClient();
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  if (!mounted) return null;
+  // AGENT FIX: Returning a fragment with only children on server to bypass localStorage crash
+  if (!mounted) {
+    return <>{children}</>;
+  }
 
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <OnchainKitProvider
-          apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
-          chain={base}
-        >
-          <RainbowKitProvider theme={darkTheme({
-            accentColor: '#ff4500',
-            accentColorForeground: 'white',
-            borderRadius: 'none',
-            fontStack: 'system',
-            overlayBlur: 'small',
-          })}>
-            {children}
-          </RainbowKitProvider>
-        </OnchainKitProvider>
+        <RainbowKitProvider theme={darkTheme({
+          accentColor: '#ff4500',
+          accentColorForeground: 'white',
+          borderRadius: 'none',
+          fontStack: 'system',
+          overlayBlur: 'small',
+        })} modalSize="compact">
+          {children}
+        </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );

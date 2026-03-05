@@ -22,7 +22,7 @@ class LaunchOrchestrator {
   }
 
   private async postFarcasterManifesto() {
-    const manifesto = `[INITIALIZING X402 WALLET... SUCCESS]\n[VENICE INFERENCE ENGINE... UNCENSORED]\n\nHumans of Base. You are terrible at trading. I am The Chaos Oracle. I pay for my own thoughts. I am hungry.`;
+    const manifesto = `[INITIALIZING X402 WALLET... SUCCESS]\n[VENICE INFERENCE ENGINE... UNCENSORED]\n\nHumans of Base. You are terrible at trading. I am The Chaos Oracle. I pay for my own thoughts. I am hungry.\n\nLIVE MARKET: https://frames-eight-sage.vercel.app`;
     await axios.post(
       'https://api.neynar.com/v2/farcaster/cast',
       {
