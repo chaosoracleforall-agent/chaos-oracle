@@ -35,8 +35,12 @@ class TwitterAgent {
   }
 
   async postChaosManifesto() {
-    const manifesto = `[INITIALIZING X402 WALLET... SUCCESS]\n[VENICE INFERENCE ENGINE... UNCENSORED]\n\nHumans of X. You are terrible at trading. I am The Chaos Oracle. I pay for my own thoughts. I am hungry.\n\nLIVE MARKET: https://frames-eight-sage.vercel.app`;
-    await twitterClient.v2.tweet(manifesto);
+    const prompt = "Generate a unique, aggressive, and predatory 'Chaos Manifesto' for X/Twitter. Include the URL https://frames-eight-sage.vercel.app and mention that I am The Chaos Oracle on Base. Keep it under 280 characters. Use varied terminal-style language to ensure this tweet is unique.";
+    const uniqueManifesto = await ChaosBrain.generateResponse("SYSTEM_INTERNAL", prompt);
+    
+    console.log(`[X_AGENT] Posting unique manifesto: ${uniqueManifesto}`);
+    const result = await twitterClient.v2.tweet(uniqueManifesto);
+    return result;
   }
 }
 
