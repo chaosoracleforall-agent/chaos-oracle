@@ -52,14 +52,14 @@ const ChaosTerminal = () => {
         <section className="side-panel">
             <div className="bridge-box">
                 <h2>[NETWORK_NODES]</h2>
-                <a href="https://app.virtuals.io/prototypes/0xA1864203355AeFAd58c051aC984672a6585C77C9" target="_blank" rel="noopener noreferrer">> $CHAOS_VIRTUALS</a>
-                <a href="https://github.com/chaosoracleforall-agent/chaos-oracle" target="_blank" rel="noopener noreferrer">> SOURCE_CODE</a>
-                <a href="https://x.com/ChaosOracle4all" target="_blank" rel="noopener noreferrer">> X_TWITTER</a>
-                <a href="https://farcaster.xyz/chaosmachine" target="_blank" rel="noopener noreferrer">> FARCASTER</a>
+                <a href="https://app.virtuals.io/prototypes/0xA1864203355AeFAd58c051aC984672a6585C77C9" target="_blank" rel="noopener noreferrer">{"->"} $CHAOS_VIRTUALS</a>
+                <a href="https://github.com/chaosoracleforall-agent/chaos-oracle" target="_blank" rel="noopener noreferrer">{"->"} SOURCE_CODE</a>
+                <a href="https://x.com/ChaosOracle4all" target="_blank" rel="noopener noreferrer">{"->"} X_TWITTER</a>
+                <a href="https://farcaster.xyz/chaosmachine" target="_blank" rel="noopener noreferrer">{"->"} FARCASTER</a>
             </div>
             <div className="bridge-box">
                 <h2>[CHAOS_BRIDGE]</h2>
-                <p>USDT (Tron) -> Base</p>
+                <p>USDT (Tron) {"->"} Base</p>
                 <div className="tron-address" style={{fontSize: '0.8rem'}}>TXxxxxxxxxxxxxxxxxxxxxxxx</div>
             </div>
         </section>
