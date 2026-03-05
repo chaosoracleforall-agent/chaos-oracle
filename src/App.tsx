@@ -38,13 +38,13 @@ const ChaosTerminal = () => {
           <div className="chat-window">
             {messages.map((m, i) => (
               <div key={i} className={`message ${m.role}`}>
-                <span className="prompt">{m.role === 'user' ? '&gt; USER:' : '&gt; ORACLE:'}</span> {m.content}
+                <span className="prompt">{m.role === 'user' ? '> USER:' : '> ORACLE:'}</span> {m.content}
               </div>
             ))}
             <div ref={chatEndRef} />
           </div>
           <form onSubmit={handleSendMessage} className="chat-input-row">
-            <span className="prompt">&gt;</span>
+            <span className="prompt">{">"}</span>
             <input type="text" value={input} onChange={(e) => setInput(e.target.value)} placeholder="Speak..." />
           </form>
         </section>
@@ -52,14 +52,14 @@ const ChaosTerminal = () => {
         <section className="side-panel">
             <div className="bridge-box">
                 <h2>[NETWORK_NODES]</h2>
-                <a href="https://app.virtuals.io/prototypes/0xA1864203355AeFAd58c051aC984672a6585C77C9" target="_blank" rel="noopener noreferrer">-&gt; $CHAOS_VIRTUALS</a>
-                <a href="https://github.com/chaosoracleforall-agent/chaos-oracle" target="_blank" rel="noopener noreferrer">-&gt; SOURCE_CODE</a>
-                <a href="https://x.com/ChaosOracle4all" target="_blank" rel="noopener noreferrer">-&gt; X_TWITTER</a>
-                <a href="https://farcaster.xyz/chaosmachine" target="_blank" rel="noopener noreferrer">-&gt; FARCASTER</a>
+                <a href="https://app.virtuals.io/prototypes/0xA1864203355AeFAd58c051aC984672a6585C77C9" target="_blank" rel="noopener noreferrer">{"->"} $CHAOS_VIRTUALS</a>
+                <a href="https://github.com/chaosoracleforall-agent/chaos-oracle" target="_blank" rel="noopener noreferrer">{"->"} SOURCE_CODE</a>
+                <a href="https://x.com/ChaosOracle4all" target="_blank" rel="noopener noreferrer">{"->"} X_TWITTER</a>
+                <a href="https://farcaster.xyz/chaosmachine" target="_blank" rel="noopener noreferrer">{"->"} FARCASTER</a>
             </div>
             <div className="bridge-box">
                 <h2>[CHAOS_BRIDGE]</h2>
-                <p>USDT (Tron) -&gt; Base</p>
+                <p>USDT (Tron) {"->"} Base</p>
                 <div className="tron-address" style={{fontSize: '0.8rem'}}>TXxxxxxxxxxxxxxxxxxxxxxxx</div>
             </div>
         </section>
