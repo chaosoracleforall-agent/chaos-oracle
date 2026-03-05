@@ -1,0 +1,3 @@
+module.exports=[4501,(e,s,t)=>{s.exports=e.x("next/dist/server/og/image-response",()=>require("next/dist/server/og/image-response"))},10306,e=>{"use strict";var s=e.i(4501),t=e.i(41505);class o extends s.ImageResponse{constructor(e,s){super((0,t.toReactNode)(e),s)}}let a=(e,o)=>"unstable_createNodejsStream"in s?s.unstable_createNodejsStream((0,t.toReactNode)(e),o):void 0;e.s(["ImageResponse",()=>o,"unstable_createNodejsStream",0,a],90049),e.i(90049);var r=e.i(45707);e.s(["ImageResponse",()=>o,"loadGoogleFont",()=>r.loadGoogleFont,"unstable_createNodejsStream",0,a],10306)}];
+
+//# sourceMappingURL=%5Broot-of-the-server%5D__285fad97._.js.map

@@ -18,6 +18,8 @@ class TwitterAgent {
       // 1. Fetch recent mentions (simplified)
       const mentions = await twitterClient.v2.userMentions(process.env.TWITTER_USER_ID!);
       
+      if (!mentions.data) return;
+
       for (const tweet of mentions.data.data) {
         // 2. Generate toxic response via ChaosBrain (Venice.ai)
         const replyText = await ChaosBrain.generateResponse(tweet.author_id!, tweet.text);
