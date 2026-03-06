@@ -1,26 +1,9 @@
 {
-  "name": "chaos-oracle-terminal",
+  "name": "chaos-oracle-root",
   "private": true,
-  "version": "1.0.0",
-  "type": "module",
+  "version": "1.0.54",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@coinbase/onchainkit": "latest",
-    "@tanstack/react-query": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "viem": "latest",
-    "wagmi": "latest"
-  },
-  "devDependencies": {
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "@vitejs/plugin-react": "latest",
-    "typescript": "latest",
-    "vite": "latest"
+    "build": "cd packages/frames && npm install && npm run build",
+    "install": "cd packages/frames && npm install"
   }
 }
