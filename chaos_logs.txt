@@ -1663,3 +1663,18 @@ X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
     at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
     at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[BRAIN_SCAN_ERROR]: Farcaster link failed.
+X Agent Loop Failed: TypeError: twitterClient.v2.userMentions is not a function
+    at TwitterAgent.scanMentionsAndReply (/Users/davidgarcia/chaos-oracle/packages/agent/twitterAgent.ts:19:47)
+    at Timeout._onTimeout (/Users/davidgarcia/chaos-oracle/packages/agent/index.ts:29:28)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
