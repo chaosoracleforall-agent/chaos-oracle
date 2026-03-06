@@ -1,0 +1,20 @@
+{
+  "name": "chaos-agent",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "start": "ts-node index.ts"
+  },
+  "dependencies": {
+    "@types/nodemailer": "^7.0.11",
+    "alchemy-sdk": "latest",
+    "axios": "latest",
+    "dotenv": "latest",
+    "ethers": "latest",
+    "nodemailer": "^8.0.1",
+    "ts-node": "latest",
+    "twitter-api-v2": "latest",
+    "typescript": "latest",
+    "viem": "latest"
+  }
+}
