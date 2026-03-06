@@ -15,7 +15,7 @@
     "wagmi": "2.9.8",
     "@rainbow-me/rainbowkit": "2.0.8",
     "@tanstack/react-query": "5.35.1",
-    "frog": "0.15.10",
+    "frog": "latest",
     "hono": "4.3.7"
   },
   "devDependencies": {

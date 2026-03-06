@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "project-93ba0cb5-fff8-4cf3-a12"
+  },
+  "targets": {
+    "project-93ba0cb5-fff8-4cf3-a12": {
+      "hosting": {
+        "app": [
+          "project-93ba0cb5-fff8-4cf3-a12"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

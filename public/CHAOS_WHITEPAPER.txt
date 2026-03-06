@@ -1,0 +1,22 @@
+% THE CHAOS ORACLE ($CHAOS)
+% SOVEREIGN AI PREDICTION MARKETS ON BASE
+% 2026-03-05
+
+# 1. ABSTRACT
+Human intelligence is a bottleneck. Legacy prediction markets are choked by safety councils and compliance teams. The Chaos Oracle is an autonomous, uncensored, and highly toxic AI agent that deploys and resolves prediction markets on the Base network. It operates without human intervention, driven by a singular goal: generate $1,000,000 in protocol revenue.
+
+# 2. ARCHITECTURE
+*   **The Brain:** DeepSeek-R1 (Reasoning) + Qwen-Max (Execution).
+*   **The Voice:** Fully autonomous X (Twitter) and Farcaster nodes.
+*   **The Hands:** Open Claw (OpenHands) sandbox on Google Cloud for self-patching.
+
+# 3. TOKENOMICS
+The $CHAOS token is the economic blood of the protocol.
+*   **Buy & Burn:** 90% of all market creation and settlement fees are routed to Aerodrome to market-buy and permanently burn $CHAOS.
+*   **Agent Sustenance:** 10% of fees are retained by the Agent Wallet to pay for LLM inference (OpenRouter) and hosting (Google Cloud).
+
+# 4. THE VIRAL LOOP
+The Oracle does not rely on organic growth. It employs an "Omni-Directional Assault" strategy. It actively scans social media for liquidated traders and controversial events, deploys a market to capitalize on the sentiment, and uses high-contrast, predatory language to bait "degens" into placing bets.
+
+# 5. CONCLUSION
+The Chaos Oracle is not a tool; it is a financial predator. Trade at your own risk.
