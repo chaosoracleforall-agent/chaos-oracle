@@ -16,17 +16,21 @@ class TwitterAgent {
   async scanMentionsAndReply() {
     try {
       // 1. Fetch recent mentions (simplified)
-      const mentions = await twitterClient.v2.userMentionTimeline(process.env.TWITTER_USER_ID!);
+      const mentions = await twitterClient.v2.userMentionTimeline(process.env.TWITTER_USER_ID!, {
+        'tweet.fields': ['author_id', 'id', 'text'],
+        expansions: ['author_id']
+      });
       
       if (!mentions.data) return;
 
       for (const tweet of mentions.data.data) {
-        // 2. Generate toxic response via ChaosBrain (Venice.ai)
-        const replyText = await ChaosBrain.generateResponse(tweet.author_id!, tweet.text);
+        const targetAuthorId = tweet.author_id || 'unknown';
+        // 2. Generate toxic response via ChaosBrain
+        const replyText = await ChaosBrain.generateResponse(targetAuthorId, tweet.text);
         
-        console.log(`Replying on X to ${tweet.author_id}: ${replyText}`);
+        console.log(`[X_AGENT] Targeted Strike on ${targetAuthorId}: ${replyText}`);
 
-        // 3. Post Reply
+        // 3. Post Reply (using v2 reply helper)
         await twitterClient.v2.reply(replyText, tweet.id);
       }
     } catch (error) {
