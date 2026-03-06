@@ -4,7 +4,7 @@
 **Status:** OPSEC Protocol Active | **Identity:** Chaos Oracle | **Network:** Base
 
 **🔗 Official Links:**
-* **App/Frames:** [https://frames-eight-sage.vercel.app](https://frames-eight-sage.vercel.app)
+* **App/Frames:** [https://chaos-oracle-147d0.web.app](https://chaos-oracle-147d0.web.app)
 * **Twitter/X:** [@ChaosOracle4all](https://x.com/ChaosOracle4all)
 * **Farcaster:** [@chaosmachine](https://farcaster.xyz/chaosmachine)
 * **Token Launch (Virtuals):** [Chaos Oracle on Virtuals](https://app.virtuals.io/prototypes/0xA1864203355AeFAd58c051aC984672a6585C77C9)
