@@ -60,27 +60,55 @@ The agent's organic growth relies on psychological manipulation and algorithmic 
 
 ---
 
-## 5. Technical Architecture (Current Progress)
+## 5. Smart Contracts
 
-### **Packages**
-- `/packages/contracts`: `PredictionMarketFactory.sol` with hardcoded fee routing and Aerodrome swap-and-burn logic.
-- `/packages/frames`: `Frog.fm` Next.js server for one-click Farcaster betting.
-- `/packages/agent`: Node.js sovereign node integrating Venice.ai, x402, and **Chaos Bridge API**.
+### V1 — PredictionMarketFactory (Live)
+- **Address:** [`0x591A48064c1DB035B1562d60ed27cE18B48Bd228`](https://basescan.org/address/0x591A48064c1DB035B1562d60ed27cE18B48Bd228)
+- **Network:** Base Mainnet
+- **Status:** 5 markets deployed and seeded
 
----
+### V2 — PredictionMarketFactoryV2 (Live)
+- **Address:** [`0x48b4a7fC8B6eD4FC3320A3286f25295a444e629D`](https://basescan.org/address/0x48b4a7fC8B6eD4FC3320A3286f25295a444e629D)
+- **Network:** Base Mainnet
+- **Deployed:** March 6, 2026
+- **Tests:** 63 passing
+- **Security Audit:** 17 findings (3 HIGH fixed pre-deployment, 3 MEDIUM acknowledged, 4 LOW, 7 INFO)
 
-## 6. Immediate Action Items (Next 48 Hours)
+**V2 Improvements:**
+- Division-by-zero protection with `claimRefund()` for one-sided markets
+- Pull-based fee collection — prevents DoS from reverting fee recipients
+- Failed buy-and-burn ETH recovery via `retryBurn()`
+- Emergency `pause()`/`unpause()` controlled by agent
+- Market creation fee (0.001 ETH) with overpayment refund
+- Market creator tracking and enhanced events
+- Solidity optimizer enabled (200 runs)
 
-1. **Infrastructure Deployment:**
-   - [x] Deploy `PredictionMarketFactory.sol` to Base Mainnet.
-   - [x] Deploy the `chaos-frames` server to Vercel/Fly.io.
-   - [x] Initialize the `chaos-agent` node on a dedicated VPS.
-2. **Key Management:**
-   - [x] Populate `.env` files with API keys (Venice, Neynar, Alchemy).
-   - [x] Secure the Agent's Private Key in the x402 wallet.
-3. **The Launch:**
-   - [x] Deploy the "Chaos Manifesto" as the Agent's first cast.
-   - [x] Trigger the first "Irrational Market" to bait the bots.
+### Packages
+- `/packages/contracts`: Solidity contracts (V1 + V2) with Hardhat toolchain
+- `/packages/agent`: Node.js autonomous agent (TypeScript, PM2, DeepSeek-R1)
+
+## 6. Liquidity
+
+| Pool | DEX | Address |
+|------|-----|---------|
+| CHAOS/VIRTUAL | Virtuals DEX | `0x77755ac7d57e0297e592137b645730ee6c37f5dc` |
+| CHAOS/WETH | Aerodrome | `0x8C774Fed3A01Fe0f10412E78532db77D42c14652` |
+
+## 7. Changelog
+
+### v2.0.0 (2026-03-06)
+- Deployed PredictionMarketFactoryV2 to Base mainnet
+- Security audit completed (17 findings, 3 HIGH fixed)
+- Pull-based fee collection, burn retry, emergency pause
+- 63 tests passing
+
+### v1.0.0 (2026-03-04)
+- Initial launch on Virtuals.io
+- PredictionMarketFactory V1 deployed
+- 5 prediction markets seeded
+- Autonomous agent with 7 operational loops
+- Twitter, Farcaster, Discord integrations live
+- Aerodrome CHAOS/WETH pool created
 
 ---
 
