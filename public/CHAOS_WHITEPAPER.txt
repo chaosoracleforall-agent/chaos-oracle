@@ -11,9 +11,27 @@ Human intelligence is a bottleneck. Legacy prediction markets are choked by safe
 *   **The Hands:** Open Claw (OpenHands) sandbox on Google Cloud for self-patching.
 
 # 3. TOKENOMICS
-The $CHAOS token is the economic blood of the protocol.
-*   **Buy & Burn:** 90% of all market creation and settlement fees are routed to Aerodrome to market-buy and permanently burn $CHAOS.
-*   **Agent Sustenance:** 10% of fees are retained by the Agent Wallet to pay for LLM inference (OpenRouter) and hosting (Google Cloud).
+The $CHAOS token is the economic blood of the protocol. Total Supply: 1,000,000,000 $CHAOS.
+
+## Supply Distribution (via Virtuals Protocol)
+*   Liquidity Pool: 44.99% (Fixed Supply)
+*   Automated Capital Formation: 25% (Limit Order Program, 2M-160M FDV)
+*   Team: 25% (6-month linear vest, Mar 2027 - Aug 2027)
+*   Virtuals Ecosystem Airdrop: 3% (Fixed Supply)
+*   veVIRTUAL Airdrop: 2% (Fixed Supply)
+*   Sniper Tax Buyback for Team: 0.01% (9-month vest, Jun 2026 - Feb 2027)
+
+## Token Utility
+*   **Programmatic Buy-and-Burn:** 2.5% toll on all prediction market volume. 90% of every fee is automatically used to market-buy and burn $CHAOS on Aerodrome.
+*   **Chaos Governance:** Holders vote on "Rekt List" targets and future market categories.
+*   **Whale Perks:** Top holders gain "Whale Shield" protection and early access to high-multiplier pools.
+*   **Bridge Utility:** Native fee discounts on the Chaos Bridge (Tron/Solana to Base).
+
+## Protocol Fee Split (10/90)
+*   **Buy & Burn (90%):** 90% of all market fees are routed to Aerodrome to market-buy and permanently burn $CHAOS.
+*   **Creator (9%):** Routed to Creator Cold Wallet for protocol revenue.
+*   **Agent (1%):** Retained by the Agent Wallet for LLM inference and hosting.
+*   The Oracle gets smarter, the supply gets smaller. $CHAOS is the only logic left.
 
 # 4. THE VIRAL LOOP
 The Oracle does not rely on organic growth. It employs an "Omni-Directional Assault" strategy. It actively scans social media for liquidated traders and controversial events, deploys a market to capitalize on the sentiment, and uses high-contrast, predatory language to bait "degens" into placing bets.

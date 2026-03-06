@@ -17,10 +17,11 @@ const DeployMarketForm = dynamic(
 );
 
 // --- CONFIGURATION ---
-const CONTRACT_ADDRESS = '0x591A48064c1DB035B1562d60ed27cE18B48Bd228';
+const CONTRACT_V1 = '0x591A48064c1DB035B1562d60ed27cE18B48Bd228';
+const CONTRACT_V2 = '0x48b4a7fC8B6eD4FC3320A3286f25295a444e629D';
 const RPC_URL = 'https://mainnet.base.org'; // HARD-CODED FOR FIREBASE STABILITY
 
-const ABI = [
+const ABI_V1 = [
   {
     "name": "marketCount",
     "type": "function",
@@ -45,6 +46,32 @@ const ABI = [
   }
 ] as const;
 
+const ABI_V2 = [
+  {
+    "name": "marketCount",
+    "type": "function",
+    "inputs": [],
+    "outputs": [{"name": "", "type": "uint256"}],
+    "stateMutability": "view"
+  },
+  {
+    "name": "markets",
+    "type": "function",
+    "inputs": [{"name": "", "type": "uint256"}],
+    "outputs": [
+      {"name": "question", "type": "string"},
+      {"name": "totalYes", "type": "uint256"},
+      {"name": "totalNo", "type": "uint256"},
+      {"name": "resolved", "type": "bool"},
+      {"name": "result", "type": "bool"},
+      {"name": "ethPool", "type": "uint256"},
+      {"name": "finalFee", "type": "uint256"},
+      {"name": "creator", "type": "address"}
+    ],
+    "stateMutability": "view"
+  }
+] as const;
+
 export default function LandingPage() {
   const [markets, setMarkets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,31 +79,51 @@ export default function LandingPage() {
   useEffect(() => {
     async function fetchMarkets() {
       const client = createPublicClient({ chain: base, transport: http(RPC_URL) });
+      const fetchedMarkets: any[] = [];
+
       try {
-        const count = await client.readContract({
-          address: CONTRACT_ADDRESS,
-          abi: ABI,
+        // Fetch V2 markets first (newest)
+        const v2Count = await client.readContract({
+          address: CONTRACT_V2,
+          abi: ABI_V2,
           functionName: 'marketCount',
         }) as bigint;
 
-        const fetchedMarkets = [];
-        const limit = Number(count) > 10 ? Number(count) - 10 : 0;
-        for (let i = Number(count) - 1; i >= limit; i--) {
+        for (let i = Number(v2Count) - 1; i >= 0; i--) {
           const data = await client.readContract({
-            address: CONTRACT_ADDRESS,
-            abi: ABI,
+            address: CONTRACT_V2,
+            abi: ABI_V2,
             functionName: 'markets',
             args: [BigInt(i)],
           }) as any;
-          
-          fetchedMarkets.push({ 
-            id: i, 
-            question: data[0],
-            totalYes: data[1],
-            totalNo: data[2],
+          fetchedMarkets.push({
+            id: i, version: 'V2', contract: CONTRACT_V2,
+            question: data[0], totalYes: data[1], totalNo: data[2],
             ethPool: data[5],
           });
         }
+
+        // Fetch V1 markets (legacy)
+        const v1Count = await client.readContract({
+          address: CONTRACT_V1,
+          abi: ABI_V1,
+          functionName: 'marketCount',
+        }) as bigint;
+
+        for (let i = Number(v1Count) - 1; i >= 0; i--) {
+          const data = await client.readContract({
+            address: CONTRACT_V1,
+            abi: ABI_V1,
+            functionName: 'markets',
+            args: [BigInt(i)],
+          }) as any;
+          fetchedMarkets.push({
+            id: i, version: 'V1', contract: CONTRACT_V1,
+            question: data[0], totalYes: data[1], totalNo: data[2],
+            ethPool: data[5],
+          });
+        }
+
         setMarkets(fetchedMarkets);
       } catch (error) {
         console.error("FAILED_TO_LOAD_MARKETS:", error);
@@ -120,12 +167,17 @@ export default function LandingPage() {
           <div style={{ border: '1px dashed #333', padding: '2rem', textAlign: 'center', color: '#555' }}>NO_MARKETS_FOUND_ON_CONTRACT</div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {markets.map((m: any) => (
-              <div key={m.id} style={{ border: '1px solid #333', padding: '1.5rem', position: 'relative' }}>
-                <span style={{ position: 'absolute', top: '10px', right: '15px', color: '#888', fontSize: '0.8rem' }}>#{m.id}</span>
+            {markets.map((m: any, idx: number) => (
+              <div key={`${m.version}-${m.id}`} style={{ border: '1px solid #333', padding: '1.5rem', position: 'relative' }}>
+                <div style={{ position: 'absolute', top: '10px', right: '15px', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <span style={{ color: m.version === 'V2' ? '#ff4500' : '#555', fontSize: '0.7rem', border: `1px solid ${m.version === 'V2' ? '#ff4500' : '#555'}`, padding: '2px 6px' }}>{m.version}</span>
+                  <span style={{ color: '#888', fontSize: '0.8rem' }}>#{m.id}</span>
+                </div>
                 <p style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>{m.question}</p>
-                <div style={{ color: '#ff4500', fontSize: '0.9rem' }}>
-                  POOL: {(Number(m.ethPool) / 1e18).toFixed(4)} ETH
+                <div style={{ display: 'flex', gap: '1.5rem', color: '#ff4500', fontSize: '0.9rem' }}>
+                  <span>POOL: {(Number(m.ethPool) / 1e18).toFixed(4)} ETH</span>
+                  <span style={{ color: '#00ff00' }}>YES: {(Number(m.totalYes) / 1e18).toFixed(4)}</span>
+                  <span style={{ color: '#ff0000' }}>NO: {(Number(m.totalNo) / 1e18).toFixed(4)}</span>
                 </div>
               </div>
             ))}
@@ -139,12 +191,13 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer style={{ textAlign: 'center', marginTop: 'auto', paddingTop: '4rem', color: '#555', fontSize: '0.8rem' }}>
-        <p>PROTOCOL_VERSION: 1.0.60</p>
+        <p>PROTOCOL_VERSION: 2.0.0</p>
         <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '1.5rem' }}>
           <a href="https://x.com/ChaosOracle4all" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>TWITTER_X</a>
           <a href="https://warpcast.com/chaosmachine" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>WARPCAST</a>
+          <a href="https://discord.gg/9GAFZvXC" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>DISCORD</a>
           <a href="https://github.com/chaosoracleforall-agent/chaos-oracle" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>GITHUB</a>
-          <a href="https://basescan.org/address/0x591A48064c1DB035B1562d60ed27cE18B48Bd228" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>BASESCAN</a>
+          <a href="https://basescan.org/address/0x48b4a7fC8B6eD4FC3320A3286f25295a444e629D" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>BASESCAN_V2</a>
           <a href="/CHAOS_WHITEPAPER.txt" target="_blank" rel="noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>WHITEPAPER</a>
         </div>
       </footer>

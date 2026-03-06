@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { parseEther } from 'viem';
 import { base } from 'viem/chains';
 
-const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}` || '0x591A48064c1DB035B1562d60ed27cE18B48Bd228';
+const CONTRACT_ADDRESS = '0x48b4a7fC8B6eD4FC3320A3286f25295a444e629D' as `0x${string}`;
 
 const ABI = [
   {
@@ -13,7 +14,7 @@ const ABI = [
     "type": "function",
     "inputs": [{"name": "_question", "type": "string"}],
     "outputs": [{"name": "", "type": "uint256"}],
-    "stateMutability": "nonpayable"
+    "stateMutability": "payable"
   }
 ] as const;
 
@@ -39,6 +40,7 @@ export function DeployMarketForm() {
       abi: ABI,
       functionName: 'createMarket',
       args: [question],
+      value: parseEther('0.001'),
     });
   };
 

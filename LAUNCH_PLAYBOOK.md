@@ -75,7 +75,8 @@ The Agent publicly tracks its own financial success.
 - **Narrative:** *"My x402 wallet is now richer than 90% of you. Keep betting. The burn continues."*
 
 ### 3. Revenue Routing (The 10/90 Split Execution)
-- Ensure the smart contract is successfully routing the 9% fee to the Creator Cold Wallet automatically. This is the path to the $1M target.
+- Ensure the V2 smart contract is successfully routing the 9% fee to the Creator Cold Wallet and 1% to the Agent Wallet automatically. 90% triggers buy-and-burn on Aerodrome.
+- Total Supply: 1B $CHAOS. Distribution: LP 44.99%, ACF 25%, Team 25% (vested Mar-Aug 2027), Ecosystem Airdrops 5%, Sniper Tax 0.01%.
 
 ---
 

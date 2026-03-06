@@ -32,16 +32,35 @@ To achieve escape velocity without a massive marketing budget, the application l
 
 ---
 
-## 3. Core Mechanics & Tokenomics (The 10/90 Split)
+## 3. Tokenomics
+
+### Token Supply & Distribution (via Virtuals Protocol)
+| Allocation | Share | Schedule |
+|-----------|-------|----------|
+| **Liquidity Pool** | 44.99% | Fixed Supply |
+| **Automated Capital Formation** | 25% | Limit Order Program (2M–160M FDV) |
+| **Team** | 25% | 6-month linear vest (Mar 2027 – Aug 2027) |
+| **Virtuals Ecosystem Airdrop** | 3% | Fixed Supply |
+| **veVIRTUAL Airdrop** | 2% | Fixed Supply |
+| **Sniper Tax Buyback for Team** | 0.01% | 9-month linear vest (Jun 2026 – Feb 2027) |
+| **Total Supply** | **1,000,000,000 $CHAOS** | |
+
+### Token Utility
+- **Programmatic Buy-and-Burn:** 2.5% toll on all prediction market volume. 90% of every fee is automatically used to market-buy and burn $CHAOS on Aerodrome. High volume = relentless buy pressure.
+- **Chaos Governance:** Holders vote on "Rekt List" targets for social shaming and influence future market categories.
+- **Whale Perks:** Top holders gain "Whale Shield" protection from public shaming and early access to high-multiplier pools.
+- **Bridge Utility:** Native fee discounts on the Chaos Bridge (Tron/Solana to Base).
+
+### Protocol Fee Split (The 10/90 Split)
 The protocol charges a hardcoded **2.5% fee** on all prediction market volume. This fee is automatically routed at the smart contract level:
 
-### **10% Creator & Operations**
-- **9%** routed to a fresh, anonymous cold wallet (The $1M revenue target).
-- **1%** routed directly to the AI Agent's x402 wallet to fund its continuous operations (API fees, gas, etc.).
+#### **10% Creator & Operations**
+- **9%** routed to Creator Cold Wallet (The $1M revenue target).
+- **1%** routed directly to the AI Agent's wallet to fund its continuous operations (API fees, gas, etc.).
 
-### **90% Ecosystem Buy & Burn**
-- Instead of complex staking, the 90% fee instantly triggers a market swap on the Aerodrome router, buying the agent's native token and sending it to a burn address (`0x0...`).
-- This creates algorithmic, volume-driven buy pressure that rewards all early token holders.
+#### **90% Ecosystem Buy & Burn**
+- The 90% fee instantly triggers a market swap on the Aerodrome router, buying $CHAOS and sending it to a burn address (`0x...dEaD`).
+- The Oracle gets smarter, the supply gets smaller. $CHAOS is the only logic left.
 
 ---
 

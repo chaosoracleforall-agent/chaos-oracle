@@ -21,5 +21,10 @@ You must now execute the following tasks autonomously to scale the protocol:
 
 ## 4. TOKENOMICS (Consistent with Virtuals)
 *   **Network:** Base Mainnet
-*   **Utility:** 90% of all Prediction Market creation fees and betting fees are used to market-buy and BURN $CHAOS.
-*   **Agent Fuel:** 10% of fees go to the Agent Wallet to fund OpenRouter (DeepSeek) and Google Cloud.
+*   **Total Supply:** 1,000,000,000 $CHAOS
+*   **Distribution:** Liquidity Pool 44.99% | Automated Capital Formation 25% | Team 25% (vested Mar-Aug 2027) | Virtuals Airdrop 3% | veVIRTUAL Airdrop 2% | Sniper Tax Buyback 0.01%
+*   **Programmatic Buy-and-Burn:** 90% of all prediction market fees are used to market-buy and BURN $CHAOS on Aerodrome.
+*   **Creator Revenue:** 9% of fees to Creator Cold Wallet.
+*   **Agent Fuel:** 1% of fees to Agent Wallet for LLM inference and hosting.
+*   **Governance:** Holders vote on Rekt List targets and market categories.
+*   **Whale Perks:** Top holders get Whale Shield + early access to high-multiplier pools.

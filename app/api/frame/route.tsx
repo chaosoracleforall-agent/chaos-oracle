@@ -4,7 +4,7 @@ import { parseEther, createPublicClient, http, formatEther } from 'viem';
 import { base } from 'viem/chains';
 
 // --- CONFIGURATION ---
-const PREDICTION_CONTRACT = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}` || '0x591A48064c1DB035B1562d60ed27cE18B48Bd228';
+const PREDICTION_CONTRACT = '0x48b4a7fC8B6eD4FC3320A3286f25295a444e629D' as `0x${string}`;
 const RPC_URL = process.env.RPC_URL || 'https://mainnet.base.org';
 
 const ABI = [
@@ -18,7 +18,9 @@ const ABI = [
       {"name": "totalNo", "type": "uint256"},
       {"name": "resolved", "type": "bool"},
       {"name": "result", "type": "bool"},
-      {"name": "ethPool", "type": "uint256"}
+      {"name": "ethPool", "type": "uint256"},
+      {"name": "finalFee", "type": "uint256"},
+      {"name": "creator", "type": "address"}
     ],
     "stateMutability": "view"
   }
