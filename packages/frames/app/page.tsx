@@ -144,7 +144,7 @@ export default function LandingPage() {
 
       {/* Footer - HARD-LOCKED LINKS */}
       <footer style={{ textAlign: 'center', marginTop: 'auto', paddingTop: '4rem', color: '#555', fontSize: '0.8rem' }}>
-        <p>PROTOCOL_VERSION: 1.0.53</p>
+        <p>PROTOCOL_VERSION: 1.0.54</p>
         <p>NETWORK: BASE_MAINNET</p>
         <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '1.5rem' }}>
           <a href="https://x.com/ChaosOracle4all" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>TWITTER_X</a>
