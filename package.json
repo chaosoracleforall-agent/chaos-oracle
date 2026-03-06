@@ -1,9 +1,26 @@
 {
-  "name": "chaos-oracle-root",
-  "private": true,
-  "version": "1.0.54",
+  "name": "chaos-frames",
+  "version": "1.0.3",
   "scripts": {
-    "build": "cd packages/frames && npm install && npm run build",
-    "install": "cd packages/frames && npm install"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@rainbow-me/rainbowkit": "^2.2.10",
+    "@tanstack/react-query": "^5.90.21",
+    "frog": "latest",
+    "hono": "latest",
+    "next": "14.2.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "viem": "^2.47.0",
+    "wagmi": "^2.19.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "@types/react": "^18.3.2",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.4.5"
   }
 }
