@@ -24,7 +24,7 @@ const ABI = [
   }
 ] as const;
 
-export const app = new Frog({
+const app = new Frog({
   basePath: '/api/frame',
   title: 'Chaos Oracle Markets',
 });

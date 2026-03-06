@@ -1,7 +1,1 @@
-{
-  "/_global-error/page": "/_global-error",
-  "/_not-found/page": "/_not-found",
-  "/api/frame/route": "/api/frame",
-  "/bridge/page": "/bridge",
-  "/page": "/"
-}
+{"/_not-found/page":"/_not-found","/page":"/","/api/frame/route":"/api/frame","/bridge/page":"/bridge"}

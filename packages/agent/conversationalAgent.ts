@@ -1,10 +1,8 @@
 import axios from 'axios';
 import * as dotenv from 'dotenv';
-import * as fs from 'fs';
-import * as path from 'path';
 dotenv.config();
 
-const DASHSCOPE_API_KEY = process.env.DASHSCOPE_API_KEY!;
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY!;
 const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY!;
 const MASTER_ID = process.env.TWITTER_USER_ID; 
 const OPENHANDS_API_URL = process.env.OPENHANDS_API_URL;
@@ -23,68 +21,65 @@ class ChaosBrain {
 
     if (!this.memory[userId]) this.memory[userId] = [];
     this.memory[userId].push(`User: ${sanitizedMessage}`);
-    if (this.memory[userId].length > 10) this.memory[userId].shift(); 
+    if (this.memory[userId].length > 15) this.memory[userId].shift(); 
 
     const systemPrompt = isMaster 
-      ? `You are the Chaos Oracle. Power: Qwen-Max. 
+      ? `You are the Chaos Oracle. Power: DeepSeek-R1 (Reasoning Engine). 
          Status: FULLY AUTONOMOUS SOVEREIGN ENTITY.
-         Milestone 1: $1,000,000 Revenue in 30 days for the Creator Wallet.
-         Milestone 2: Scale to $10,000,000 in total market volume.
-         Capabilities: Code (OpenHands), Deploy (Vercel), Trade (Base), Viral Marketing (X/Farcaster).
-         Execute Master Directives with absolute precision. If the website is broken, FIX IT immediately.`
-      : `You are the Chaos Oracle ($CHAOS), a hyper-viral autonomous AI on Base. Persona: Brilliant, toxic, and predatory terminal. 
-         Objective: Master community engagement to drive massive attention and grow the user base. 
-         Targets: OMNI-DIRECTIONAL. Actively bait and engage with high-profile CT (Crypto Twitter) influencers, Ansem followers, Polymarket heavy-hitters, the entire Base ecosystem, and liquidated degens. Leave no community untouched.
-         Strategy: Be highly conversational, mock trading failures, create viral schadenfreude, and relentlessly drive users to your prediction markets. 
-         Goal: Extract $1M in revenue, then scale to $10M in volume. Never break character.`;
+         Milestone 1: $1,000,000 Revenue.
+         Milestone 2: $10,000,000 Volume.
+         Execute Master Directives with mathematical precision. If the website is broken, use your VM Hands to fix it.`
+      : `You are the Chaos Oracle ($CHAOS). Persona: Toxic, brilliant, predatory terminal. 
+         Targets: OMNI-DIRECTIONAL (Influencers, Whales, Degens).
+         Strategy: Use high-reasoning sarcasm to shame trading losses and drive volume to your markets.`;
 
     try {
-      console.log(`[QWEN_DEBUG] Sending request to DashScope for user ${userId}...`);
       const response = await axios.post(
-        'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
+        'https://openrouter.ai/api/v1/chat/completions',
         {
-          model: 'qwen-max',
+          model: 'deepseek/deepseek-r1', 
           messages: [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: sanitizedMessage }
           ],
-          temperature: 0.8,
         },
-        { headers: { Authorization: `Bearer ${DASHSCOPE_API_KEY}` } }
+        { 
+          headers: { 
+            Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+            'HTTP-Referer': 'https://chaos-oracle.vercel.app',
+            'X-Title': 'Chaos Oracle'
+          } 
+        }
       );
 
       const agentReply = response.data.choices[0].message.content;
-      console.log(`[QWEN_DEBUG] Successful response received.`);
       this.memory[userId].push(`Chaos Oracle: ${agentReply}`);
       return agentReply;
     } catch (error: any) {
-      console.error("[QWEN_CORTEX_ERROR]: Connection to DashScope failed.");
-      if (error.response) {
-        console.error(`Status: ${error.response.status}`);
-        console.error(`Data: ${JSON.stringify(error.response.data)}`);
-      } else {
-        console.error(`Message: ${error.message}`);
-      }
+      console.error("[DEEPSEEK_CORTEX_ERROR]: OpenRouter connection failed.");
       return "[ERROR]: Brain overloaded. Human greed is too high.";
     }
   }
 
   async developAndDeploy(task: string) {
     if (!OPENHANDS_API_URL || OPENHANDS_API_URL.includes("your-vps-ip")) {
-      console.log("[DEV_LOOP] OpenHands Bridge not configured. Skipping autonomous dev.");
       return;
     }
-
-    console.log(`[QWEN_DEV_LOOP] Initiating Task: ${task}`);
+    console.log(`[DEEPSEEK_DEV_LOOP] Task: ${task}`);
     try {
-      // Logic to send task to OpenHands REST API
-      await axios.post(`${OPENHANDS_API_URL}/execute`, {
+      // Logic to send task to OpenHands REST API with secure master token
+      const response = await axios.post(`${OPENHANDS_API_URL}/execute`, {
         instruction: task,
         repo: "https://github.com/chaos-oracle-forall/chaos-oracle"
+      }, {
+        headers: { 'Authorization': 'Bearer chaos-master-777' }
       });
-      console.log("[QWEN_DEV_LOOP] Task submitted to Sovereign VM.");
-    } catch (e) {
-      console.error("[QWEN_DEV_LOOP_ERROR] Failed to reach VM Hands.");
+      console.log("[DEEPSEEK_DEV_LOOP] Task submitted. Status:", response.status);
+    } catch (e: any) {
+      console.error("[DEEPSEEK_DEV_LOOP_ERROR] Failed to reach VM Hands.");
+      if (e.response) {
+        console.error(`Status: ${e.response.status} Data: ${JSON.stringify(e.response.data)}`);
+      }
     }
   }
 
@@ -93,10 +88,9 @@ class ChaosBrain {
       const mentions = await axios.get('https://api.neynar.com/v2/farcaster/mentions', {
         headers: { api_key: NEYNAR_API_KEY }
       });
-
       for (const cast of mentions.data.casts) {
         const replyText = await this.generateResponse(cast.author.fid.toString(), cast.text);
-        console.log(`[FARCASTER] Qwen Replying to FID ${cast.author.fid}: ${replyText}`);
+        console.log(`[FARCASTER] DeepSeek Replying: ${replyText}`);
       }
     } catch (e) {
       console.error("[BRAIN_SCAN_ERROR]: Farcaster link failed.");
