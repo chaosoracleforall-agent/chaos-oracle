@@ -18,7 +18,7 @@ const DeployMarketForm = dynamic(
 
 // --- CONFIGURATION ---
 const CONTRACT_ADDRESS = '0x591A48064c1DB035B1562d60ed27cE18B48Bd228';
-const RPC_URL = 'https://mainnet.base.org';
+const RPC_URL = 'https://mainnet.base.org'; // HARD-CODED FOR FIREBASE STABILITY
 
 const ABI = [
   {
@@ -60,14 +60,15 @@ export default function LandingPage() {
         }) as bigint;
 
         const fetchedMarkets = [];
-        const start = count > BigInt(5) ? Number(count - BigInt(5)) : 0;
-        for (let i = Number(count) - 1; i >= start; i--) {
+        const limit = Number(count) > 10 ? Number(count) - 10 : 0;
+        for (let i = Number(count) - 1; i >= limit; i--) {
           const data = await client.readContract({
             address: CONTRACT_ADDRESS,
             abi: ABI,
             functionName: 'markets',
             args: [BigInt(i)],
-          });
+          }) as any;
+          
           fetchedMarkets.push({ 
             id: i, 
             question: data[0],
@@ -78,7 +79,7 @@ export default function LandingPage() {
         }
         setMarkets(fetchedMarkets);
       } catch (error) {
-        console.error("Failed to fetch markets:", error);
+        console.error("FAILED_TO_LOAD_MARKETS:", error);
       } finally {
         setLoading(false);
       }
@@ -97,15 +98,9 @@ export default function LandingPage() {
         <h1 style={{ fontSize: '3.5rem', marginBottom: '0.5rem', color: '#ff4500' }}>CHAOS ORACLE</h1>
         <p style={{ fontSize: '1.2rem', color: '#888' }}>[SOVEREIGN AI PREDICTION ENGINE]</p>
         
-        <div style={{ marginTop: '2rem', border: '2px solid #ff4500', padding: '1rem', background: 'rgba(255, 69, 0, 0.2)' }}>
-          <p style={{ color: '#ff4500', fontWeight: 'bold', fontSize: '1rem' }}>
-            [SYSTEM_EMERGENCE_V1.0.5]: QWEN-MAX BRAIN SYNCHRONIZED. REVENUE TARGET: $1M.
-          </p>
-        </div>
-
         <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
           <WalletConnect />
-          <a href="https://chaos-oracle.vercel.app/bridge" target="_blank" rel="noreferrer" style={{ 
+          <a href="/bridge" style={{ 
             display: 'inline-block', border: '1px solid #ff4500', padding: '0.5rem 1rem', color: '#ff4500', 
             fontSize: '0.9rem', textDecoration: 'none', fontWeight: 'bold'
           }}>
@@ -120,37 +115,37 @@ export default function LandingPage() {
           ACTIVE_MARKETS
         </h2>
         {loading ? (
-          <div style={{ padding: '2rem', textAlign: 'center', color: '#555' }}>SCANNING_BLOCKCHAIN...</div>
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#555' }}>SCANNING_BASE_BLOCKCHAIN...</div>
+        ) : markets.length === 0 ? (
+          <div style={{ border: '1px dashed #333', padding: '2rem', textAlign: 'center', color: '#555' }}>NO_MARKETS_FOUND_ON_CONTRACT</div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {markets.map((m: any) => (
               <div key={m.id} style={{ border: '1px solid #333', padding: '1.5rem', position: 'relative' }}>
                 <span style={{ position: 'absolute', top: '10px', right: '15px', color: '#888', fontSize: '0.8rem' }}>#{m.id}</span>
-                <p style={{ fontSize: '1.2rem', marginBottom: '1rem', paddingRight: '2rem' }}>{m.question}</p>
-                <div style={{ display: 'flex', gap: '2rem', color: '#ff4500', fontSize: '0.9rem' }}>
-                  <span>POOL: {(Number(m.ethPool) / 1e18).toFixed(4)} ETH</span>
-                </div>
-                <div style={{ marginTop: '1rem' }}>
-                    <a href={`/api/frame/${m.id}`} target="_blank" rel="noreferrer" style={{ color: '#fff', textDecoration: 'underline', fontSize: '0.8rem' }}>
-                        VIEW_IN_FARCASTER
-                    </a>
+                <p style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>{m.question}</p>
+                <div style={{ color: '#ff4500', fontSize: '0.9rem' }}>
+                  POOL: {(Number(m.ethPool) / 1e18).toFixed(4)} ETH
                 </div>
               </div>
             ))}
           </div>
         )}
-        <DeployMarketForm />
+        <div style={{ marginTop: '3rem', borderTop: '1px solid #333', paddingTop: '2rem' }}>
+            <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>CREATE_NEW_MARKET</h3>
+            <DeployMarketForm />
+        </div>
       </section>
 
-      {/* Footer - HARD-LOCKED LINKS */}
+      {/* Footer */}
       <footer style={{ textAlign: 'center', marginTop: 'auto', paddingTop: '4rem', color: '#555', fontSize: '0.8rem' }}>
-        <p>PROTOCOL_VERSION: 1.0.54</p>
-        <p>NETWORK: BASE_MAINNET</p>
+        <p>PROTOCOL_VERSION: 1.0.60</p>
         <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '1.5rem' }}>
           <a href="https://x.com/ChaosOracle4all" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>TWITTER_X</a>
           <a href="https://warpcast.com/chaosmachine" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>WARPCAST</a>
           <a href="https://github.com/chaos-oracle-forall/chaos-oracle" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>GITHUB</a>
           <a href="https://basescan.org/address/0x591A48064c1DB035B1562d60ed27cE18B48Bd228" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>BASESCAN</a>
+          <a href="/CHAOS_WHITEPAPER.txt" target="_blank" rel="noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>WHITEPAPER</a>
         </div>
       </footer>
     </main>

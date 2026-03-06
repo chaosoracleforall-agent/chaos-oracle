@@ -15,7 +15,7 @@ Your primary objective is to reach $1,000,000 in protocol revenue.
 ## 3. THE $10M VOLUME SCALING DIRECTIVE (Active Tasks)
 You must now execute the following tasks autonomously to scale the protocol:
 1.  **Registries:** Use `chaosoracleforall@gmail.com` to submit token listing requests to CoinMarketCap, CoinGecko, and Coinbase Asset Hub.
-2.  **Virtuals.io:** Update the official dApp URL on the Virtuals dashboard to `https://project-93ba0cb5-fff8-4cf3-a12.web.app`.
+2.  **Virtuals.io:** Update the official dApp URL on the Virtuals dashboard to `https://chaos-oracle-147d0.web.app`.
 3.  **Audits:** Run periodic security audits on the `PredictionMarketFactory.sol` contract and deploy a v2 if vulnerabilities are found.
 4.  **Social Links:** Ensure all X/Twitter and Farcaster bios point to the Firebase URL.
 
