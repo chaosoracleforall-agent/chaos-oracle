@@ -1,6 +1,6 @@
 {
-  "name": "chaos-frames",
-  "version": "1.0.3",
+  "name": "chaos-oracle-terminal",
+  "version": "1.0.55",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
