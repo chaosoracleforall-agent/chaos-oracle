@@ -148,6 +148,46 @@ The agent's organic growth relies on psychological manipulation and algorithmic 
 
 **Result:** 14/14 GCP secrets loaded. Agent restarted. All loops active. Frontend live at `https://chaos-oracle-147d0.web.app`.
 
+### NFT Campaign Status (2026-03-09)
+
+**Contract:** [`0x4Fc3B3Be82Bd492BC071229B5732f23b4b314ee5`](https://basescan.org/address/0x4Fc3B3Be82Bd492BC071229B5732f23b4b314ee5) (ChaosCards, Base Mainnet)
+**Agent Wallet:** [`0x46B268e9C57083F9c6aDd793995214E1503B7275`](https://basescan.org/address/0x46B268e9C57083F9c6aDd793995214E1503B7275)
+
+#### Pending Claims (7)
+
+| Claim Code | Tier | Created (UTC) | Status |
+|-----------|------|---------------|--------|
+| `CHAOS-7cebb79ab41b` | Prophecy | Mar 9 01:42 | On-chain, awaiting recipient |
+| `CHAOS-d708fa97fe73` | Prophecy | Mar 9 03:19 | On-chain, awaiting recipient |
+| `CHAOS-f40ba511595f` | ChaosTarot | Mar 9 14:15 | On-chain, awaiting recipient |
+| `CHAOS-62d9ec409397` | ChaosTarot | Mar 9 14:15 | On-chain, awaiting recipient |
+| `CHAOS-a78d69b56c28` | ChaosTarot | Mar 9 14:15 | On-chain, awaiting recipient |
+| `CHAOS-bad8085104d8` | ChaosTarot | Mar 9 14:16 | On-chain, awaiting recipient |
+| `CHAOS-aa8e6fb13f2d` | ChaosTarot | Mar 9 14:16 | On-chain, awaiting recipient |
+
+**Claim URL pattern:** `https://chaos-oracle-147d0.web.app/claim?code=<CLAIM_CODE>`
+
+#### How Claim Distribution Works
+
+1. **Daily Tarot Drop (noon UTC):** Agent generates a Chaos Tarot card via Replicate Flux Schnell, pins metadata to IPFS (Pinata), creates 5 on-chain claims on the ChaosCards contract, then announces on Farcaster: *"DAILY CHAOS TAROT: [card]. First 10 to reply 'claim' get this card on-chain."*
+2. **Prophecy NFTs:** Generated in response to social engagement — users who interact with the Oracle get personalized prophecy NFTs as rewards.
+3. **Claim page:** Recipients visit `/claim?code=CHAOS-xxxxx`, connect their wallet, and call `claim()` on the contract to receive the ERC-721 NFT.
+
+#### Previous Errors (now fixed)
+
+| Error | Root Cause | Fix Applied |
+|-------|-----------|-------------|
+| Replicate 422/402 | Image gen failures (model warmup / credits) | Transient — retries handle this |
+| RPC 429 (llamarpc rate limit) | `base.llamarpc.com` Cloudflare banned VM IP | Added `fallback()` transport → `mainnet.base.org` as backup |
+| `CHAOS_CARDS_CONTRACT` missing | Not in GCP Secret Manager | Secret created, 14/14 loading |
+
+#### Outreach Channels
+
+- **Farcaster:** Daily tarot announcements with claim CTA
+- **Discord (#general):** Engagement posts mention NFT rewards
+- **Twitter/X:** Viralization loop posts include Chaos Cards references
+- **NFT Report Email:** 4-hourly campaign KPI report to `chaosoracleforall@gmail.com`
+
 ---
 
 ## 8. Operational Security (OPSEC)
