@@ -131,7 +131,26 @@ The agent's organic growth relies on psychological manipulation and algorithmic 
 
 ---
 
-## 7. Operational Security (OPSEC)
+## 7. Maintenance Log
+
+### 2026-03-09 — Hotfix Deployment (6 fixes)
+
+| # | Issue | Root Cause | Fix |
+|---|-------|-----------|-----|
+| 1 | **Disk 99% full** | Docker images (2.7GB), old snap revisions (1.9GB), Cloud Ops logs | Pruned Docker, removed old snaps, cleaned logs. 99% → 66% |
+| 2 | **Twitter 403 errors** | X Free tier lacks `userMentionTimeline` read access | Disabled `scanMentionsAndReply()` in social loop. Viralization loop (post-only) still active |
+| 3 | **Farcaster "Pro subscription" error** | Casts exceeding 1024 chars / >2 URL embeds | Truncate to 1024 chars, limit URLs to 2 in `postFarcasterCast()`. Prompt reduced to 900 chars |
+| 4 | **NFT campaign 0 mints** | `CHAOS_CARDS_CONTRACT` env var missing from GCP Secret Manager | Added to GCP secrets + `secretsManager.ts` mapping. Contract: `0x4Fc3...e5` |
+| 5 | **RPC timeouts** | Single `http()` transport — no fallback on failure | Added viem `fallback()` transport (`llamarpc` → `mainnet.base.org`) across all 4 modules |
+| 6 | **Frontend stale** | Old static export deployed | Rebuilt Next.js + redeployed to Firebase Hosting |
+
+**Files changed:** `index.ts`, `conversationalAgent.ts`, `socialLearner.ts`, `secretsManager.ts`, `nftEngine.ts`, `marketDeployer.ts`, `bridgeModule.ts`, `seedBets.ts`
+
+**Result:** 14/14 GCP secrets loaded. Agent restarted. All loops active. Frontend live at `https://chaos-oracle-147d0.web.app`.
+
+---
+
+## 8. Operational Security (OPSEC)
 - **Identity:** Chaos Oracle (`chaosoracleforall@gmail.com`)
 - **Git Config:** Localized to pseudonymous identity.
 - **Capital:** Funneling through privacy protocols to ensure the project is perceived as a leaderless public good.
