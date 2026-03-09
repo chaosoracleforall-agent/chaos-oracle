@@ -2,51 +2,40 @@ import hre from "hardhat";
 
 async function main() {
   const [deployer] = await hre.ethers.getSigners();
-  console.log("[DEPLOYER] Account:", deployer.address);
-  console.log("[DEPLOYER] Balance:", hre.ethers.formatEther(await hre.ethers.provider.getBalance(deployer.address)), "ETH");
 
-  // Base Mainnet addresses
-  const creatorWallet = "0x398bA4b1b82be8FdACdAbeB163584C7376b023B8";
-  const agentWallet = "0x6a2A797CB5736252E44B81965aa7fcF7f43F4103";
-  const chaosToken = "0xA1864203355AeFAd58c051aC984672a6585C77C9";
-  const aerodromeRouter = "0xcF77a3Ba9A5CA399B7c97c74d54e5b1Beb874E43";
-  const weth = "0x4200000000000000000000000000000000000006";
+  console.log("Deploying PredictionMarketFactoryV2 with account:", deployer.address);
+  console.log("Account balance:", (await hre.ethers.provider.getBalance(deployer.address)).toString());
 
-  console.log("\n[DEPLOYER] Deploying PredictionMarketFactoryV2...");
+  const CREATOR_WALLET = "0x398bA4b1b82be8FdACdAbeB163584C7376b023B8";
+  const AGENT_WALLET = "0x6a2A797CB5736252E44B81965aa7fcF7f43F4103";
+  const CHAOS_TOKEN = "0xA1864203355AeFAd58c051aC984672a6585C77C9";
+  const AERODROME_ROUTER = "0xcF77a3Ba9A5CA399B7c97c74d54e5b1Beb874E43";
+  const WETH = "0x4200000000000000000000000000000000000006";
+
   const Factory = await hre.ethers.getContractFactory("PredictionMarketFactoryV2");
-  const factory = await Factory.deploy(creatorWallet, agentWallet, chaosToken, aerodromeRouter, weth);
+  const factory = await Factory.deploy(
+    CREATOR_WALLET,
+    AGENT_WALLET,
+    CHAOS_TOKEN,
+    AERODROME_ROUTER,
+    WETH
+  );
+
   await factory.waitForDeployment();
-
   const address = await factory.getAddress();
-  console.log("\n══════════════════════════════════════════");
-  console.log("  CHAOS ORACLE V2 DEPLOYED");
-  console.log("══════════════════════════════════════════");
-  console.log("  Contract:", address);
-  console.log("  Creator (9%):", creatorWallet);
-  console.log("  Agent (1%):", agentWallet);
-  console.log("  CHAOS Token:", chaosToken);
-  console.log("  Aerodrome Router:", aerodromeRouter);
-  console.log("  WETH:", weth);
-  console.log("══════════════════════════════════════════");
 
-  // Verify on BaseScan
-  if (hre.network.name === "base") {
-    console.log("\n[DEPLOYER] Waiting 30s for block confirmations before verification...");
-    await new Promise(r => setTimeout(r, 30000));
-
-    try {
-      await hre.run("verify:verify", {
-        address: address,
-        constructorArguments: [creatorWallet, agentWallet, chaosToken, aerodromeRouter, weth],
-      });
-      console.log("[DEPLOYER] Contract verified on BaseScan!");
-    } catch (e) {
-      console.error("[DEPLOYER] Verification failed:", e.message);
-    }
-  }
+  console.log("PredictionMarketFactoryV2 deployed to:", address);
+  console.log("\nNEXT STEPS:");
+  console.log("1. Update CONTRACT_ADDRESS in chaos-oracle/app/page.tsx");
+  console.log("2. Update CONTRACT_ADDRESS in chaos-oracle/app/ClientComponents.tsx");
+  console.log("3. Update CONTRACT_ADDRESS in agent-node/.env");
+  console.log("4. Verify on BaseScan: npx hardhat verify --network base", address,
+    CREATOR_WALLET, AGENT_WALLET, CHAOS_TOKEN, AERODROME_ROUTER, WETH);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
