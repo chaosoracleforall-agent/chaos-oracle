@@ -7,7 +7,7 @@ async function main() {
   console.log("Account balance:", (await hre.ethers.provider.getBalance(deployer.address)).toString());
 
   const CREATOR_WALLET = "0x398bA4b1b82be8FdACdAbeB163584C7376b023B8";
-  const AGENT_WALLET = "0x6a2A797CB5736252E44B81965aa7fcF7f43F4103";
+  const AGENT_WALLET = "0x46B268e9C57083F9c6aDd793995214E1503B7275";
   const CHAOS_TOKEN = "0xA1864203355AeFAd58c051aC984672a6585C77C9";
   const AERODROME_ROUTER = "0xcF77a3Ba9A5CA399B7c97c74d54e5b1Beb874E43";
   const WETH = "0x4200000000000000000000000000000000000006";

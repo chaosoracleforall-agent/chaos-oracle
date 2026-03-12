@@ -23,7 +23,7 @@ const BettingCard = dynamic(
 
 // --- CONFIGURATION ---
 const CONTRACT_V1 = '0x591A48064c1DB035B1562d60ed27cE18B48Bd228';
-const CONTRACT_V2 = '0x48b4a7fC8B6eD4FC3320A3286f25295a444e629D';
+const CONTRACT_V2 = '0x1b60e2C970Fe6e64c6e067130FF4Ae8a713E93b6';
 const RPC_URL = 'https://base.llamarpc.com';
 
 const ABI_V1 = [
@@ -226,7 +226,7 @@ export default function LandingPage() {
           <a href="https://warpcast.com/chaosmachine" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>WARPCAST</a>
           <a href="https://discord.gg/9GAFZvXC" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>DISCORD</a>
           <a href="https://github.com/chaosoracleforall-agent/chaos-oracle" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>GITHUB</a>
-          <a href="https://basescan.org/address/0x48b4a7fC8B6eD4FC3320A3286f25295a444e629D" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>BASESCAN</a>
+          <a href="https://basescan.org/address/0x1b60e2C970Fe6e64c6e067130FF4Ae8a713E93b6" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>BASESCAN</a>
           <a href="/CHAOS_WHITEPAPER.txt" target="_blank" rel="noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>WHITEPAPER</a>
         </div>
         <p>PROTOCOL_VERSION: 3.0.0</p>

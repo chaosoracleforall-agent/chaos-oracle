@@ -6,7 +6,7 @@ import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { parseEther } from 'viem';
 import { base } from 'viem/chains';
 
-const CONTRACT_ADDRESS = '0x48b4a7fC8B6eD4FC3320A3286f25295a444e629D' as `0x${string}`;
+const CONTRACT_ADDRESS = '0x1b60e2C970Fe6e64c6e067130FF4Ae8a713E93b6' as `0x${string}`;
 
 const ABI = [
   {

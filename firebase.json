@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "chaos-oracle-147d0",
     "public": "out",
     "ignore": [
       "firebase.json",
