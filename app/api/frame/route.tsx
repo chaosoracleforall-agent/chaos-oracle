@@ -38,10 +38,21 @@ const client = createPublicClient({
 
 // Frame route for a specific market
 app.frame('/:marketId', async (c) => {
-  const { marketId } = c.req.param();
-  
+  const rawMarketId = c.req.param().marketId;
+  const marketId = parseInt(rawMarketId, 10);
+
   let question = "MARKET_NOT_FOUND";
   let poolSize = "0 ETH";
+
+  if (isNaN(marketId) || marketId < 0) {
+    return c.res({
+      image: (
+        <div style={{ display: 'flex', background: 'black', color: 'white', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+          <h1 style={{ fontSize: '48px' }}>Invalid Market ID</h1>
+        </div>
+      ),
+    });
+  }
 
   try {
     const data = await client.readContract({

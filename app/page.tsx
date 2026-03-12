@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { createPublicClient, http, formatEther } from 'viem';
 import { base } from 'viem/chains';
@@ -24,7 +24,7 @@ const BettingCard = dynamic(
 // --- CONFIGURATION ---
 const CONTRACT_V1 = '0x591A48064c1DB035B1562d60ed27cE18B48Bd228';
 const CONTRACT_V2 = '0x48b4a7fC8B6eD4FC3320A3286f25295a444e629D';
-const RPC_URL = 'https://mainnet.base.org'; // HARD-CODED FOR FIREBASE STABILITY
+const RPC_URL = 'https://base.llamarpc.com';
 
 const ABI_V1 = [
   {

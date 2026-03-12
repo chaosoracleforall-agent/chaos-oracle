@@ -11,7 +11,7 @@ const WalletConnect = dynamic(
 );
 
 const CHAOS_CARDS = '0x4Fc3B3Be82Bd492BC071229B5732f23b4b314ee5' as `0x${string}`;
-const RPC_URL = 'https://mainnet.base.org';
+const RPC_URL = 'https://base.llamarpc.com';
 
 const CHAOS_CARDS_ABI = parseAbi([
   'function totalMinted() view returns (uint256)',
