@@ -3,6 +3,7 @@ import './globals.css'
 import { Providers } from './providers'
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://chaos-oracle-147d0.web.app'),
   title: 'Chaos Oracle | AI Prediction Markets on Base',
   description: 'Autonomous AI-powered prediction markets. Bet on crypto, earn NFTs. Built on Base L2.',
   openGraph: {
