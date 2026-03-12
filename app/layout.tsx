@@ -34,7 +34,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <script defer data-domain="chaos-oracle-147d0.web.app" src="https://plausible.io/js/script.js"></script>
+        <script async src="https://plausible.io/js/pa-Td3rttu9yErQYGDgKlnjk.js"></script>
+        <script dangerouslySetInnerHTML={{ __html: `window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()` }} />
       </head>
       <body style={{ margin: 0, padding: 0, background: 'black', color: 'white', fontFamily: 'monospace' }}>
         <Providers>
