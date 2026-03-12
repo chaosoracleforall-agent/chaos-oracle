@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.0.1] - 2026-03-12
+
+### Changed
+- **V2 contract redeployed** — New address `0x1b60e2C970Fe6e64c6e067130FF4Ae8a713E93b6` (agent wallet fixed from compromised `0x6a2A` to `0x46B2`). Verified on BaseScan.
+- **All contract references updated** — page.tsx, ClientComponents.tsx, frame route, README.
+- **RPC switched to llamarpc** — `mainnet.base.org` replaced with `base.llamarpc.com` in page.tsx and collection page.
+- **Frame route hardened** — marketId parameter validated (rejects non-numeric input).
+- **Firebase config fixed** — `.firebaserc` updated to target `chaos-oracle-147d0` directly.
+
 ## [3.0.0] - 2026-03-11
 
 ### Added

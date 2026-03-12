@@ -87,11 +87,12 @@ The agent's organic growth relies on psychological manipulation and algorithmic 
 - **Status:** 5 markets deployed and seeded
 
 ### V2 — PredictionMarketFactoryV2 (Live)
-- **Address:** [`0x48b4a7fC8B6eD4FC3320A3286f25295a444e629D`](https://basescan.org/address/0x48b4a7fC8B6eD4FC3320A3286f25295a444e629D)
+- **Address:** [`0x1b60e2C970Fe6e64c6e067130FF4Ae8a713E93b6`](https://basescan.org/address/0x1b60e2C970Fe6e64c6e067130FF4Ae8a713E93b6#code)
 - **Network:** Base Mainnet
-- **Deployed:** March 6, 2026
-- **Tests:** 63 passing
-- **Security Audit:** 17 findings (3 HIGH fixed pre-deployment, 3 MEDIUM acknowledged, 4 LOW, 7 INFO)
+- **Deployed:** March 12, 2026
+- **Verified:** [BaseScan Source Code](https://basescan.org/address/0x1b60e2C970Fe6e64c6e067130FF4Ae8a713E93b6#code)
+- **Tests:** 33 passing
+- **Agent Wallet:** `0x46B268e9C57083F9c6aDd793995214E1503B7275` (resolves markets)
 
 **V2 Improvements:**
 - Division-by-zero protection with `claimRefund()` for one-sided markets
@@ -104,7 +105,7 @@ The agent's organic growth relies on psychological manipulation and algorithmic 
 
 ### Packages
 - `/packages/contracts`: Solidity contracts (V1 + V2) with Hardhat toolchain
-- `/packages/agent`: Node.js autonomous agent (TypeScript, PM2, DeepSeek-R1)
+- `/packages/agent`: Node.js autonomous agent (TypeScript, PM2, tiered AI models via OpenRouter)
 
 ## 6. Liquidity
 
@@ -115,11 +116,17 @@ The agent's organic growth relies on psychological manipulation and algorithmic 
 
 ## 7. Changelog
 
+### v3.0.0 (2026-03-12)
+- PredictionMarketFactoryV2 redeployed with correct agent wallet (`0x46B2...275`)
+- Verified on BaseScan
+- Frontend v3.0.0: Betting UI, nav header, collection page, share-to-earn, OG tags, Plausible analytics
+- Agent v2.0.1: Tiered model router (Haiku/Sonnet/R1), engagement collector, growth intelligence, content strategy, MCP server
+- 15 autonomous loops, Discord/Twitter/Farcaster/Reddit active
+
 ### v2.0.0 (2026-03-06)
-- Deployed PredictionMarketFactoryV2 to Base mainnet
+- Deployed PredictionMarketFactoryV2 to Base mainnet (since superseded)
 - Security audit completed (17 findings, 3 HIGH fixed)
 - Pull-based fee collection, burn retry, emergency pause
-- 63 tests passing
 
 ### v1.0.0 (2026-03-04)
 - Initial launch on Virtuals.io
