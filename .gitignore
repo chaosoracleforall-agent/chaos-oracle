@@ -10,12 +10,18 @@ coverage/
 build/
 dist/
 
+# Next.js
+.next/
+out/
+
+# Firebase
+.firebase/
+
 # Hardhat/Foundry
 artifacts/
 cache/
 typechain/
 typechain-types/
-out/
 
 # Environment Variables (CRITICAL)
 .env
@@ -23,7 +29,6 @@ out/
 .env.development.local
 .env.test.local
 .env.production.local
-*.env
 
 # Secrets
 *.pem
@@ -32,13 +37,29 @@ id_rsa
 id_chaos_oracle
 vault.enc
 secrets.json
+*.enc
+
+# Agent state files
+packages/agent/*_state.json
+packages/agent/agent_status.json
+packages/agent/audit_report.json
+packages/agent/metrics_history.json
+packages/agent/social_diagnostics.json
+packages/agent/social_diagnostics_history.jsonl
+packages/agent/engagement_tracking.json
+packages/agent/reddit_state.json
 
 # Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.log
+chaos_logs.txt
 
 # OS Files
 .DS_Store
 Thumbs.db
-agent-node/
+
+# Large binary files (track with LFS or exclude)
+*.mp3
+*.pdf

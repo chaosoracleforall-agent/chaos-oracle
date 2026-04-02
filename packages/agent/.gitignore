@@ -1,0 +1,8 @@
+.env
+node_modules/
+*.json
+!package.json
+!tsconfig.json
+social_learning_state.json
+*.log
+dist/
