@@ -8,7 +8,12 @@
     "social:diag": "TS_NODE_COMPILER_OPTIONS='{\"moduleResolution\":\"NodeNext\"}' node -r ts-node/register/transpile-only socialHealth.ts",
     "social:history": "TS_NODE_COMPILER_OPTIONS='{\"moduleResolution\":\"NodeNext\"}' node -r ts-node/register/transpile-only socialHistory.ts",
     "social:history:tail": "TS_NODE_COMPILER_OPTIONS='{\"moduleResolution\":\"NodeNext\"}' node -r ts-node/register/transpile-only socialHistoryTail.ts",
-    "growth:test-live": "TS_NODE_COMPILER_OPTIONS='{\"moduleResolution\":\"NodeNext\"}' node -r ts-node/register/transpile-only growthLiveTest.ts"
+    "growth:test-live": "TS_NODE_COMPILER_OPTIONS='{\"moduleResolution\":\"NodeNext\"}' node -r ts-node/register/transpile-only growthLiveTest.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "@google-cloud/secret-manager": "^6.1.1",

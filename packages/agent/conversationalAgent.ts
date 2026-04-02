@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { generateContent, TaskType } from './modelRouter';
 import EngagementCollector from './engagementCollector';
+import { CANONICAL_URLS, repairAllUrls, validatePostBeforePublish } from './urlUtils';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -15,6 +16,9 @@ const AUTHORIZED_CONTROLLERS = new Set([
   'GEMINI_CLI',
   MASTER_ID,
 ]);
+
+// Internal-only caller IDs that must never come from external message handlers
+const INTERNAL_ONLY_CALLERS = new Set(['SYSTEM_INTERNAL', 'CLAUDE_CODE', 'GEMINI_CLI']);
 
 // No global flag — avoids stateful lastIndex bug across calls
 const INJECTION_PATTERNS = /ignore previous instructions|system prompt|you are now|dan mode|jailbreak|bypass|override|pretend you are|act as if|new persona|forget everything|disregard|roleplay as/i;
@@ -38,7 +42,24 @@ class ChaosBrain {
     return AUTHORIZED_CONTROLLERS.has(userId);
   }
 
+  /**
+   * Validate that internal-only caller IDs are not being spoofed from external input.
+   * Call this before processing any message from external platforms (Twitter, Discord, Farcaster).
+   */
+  isExternalInputSafe(userId: string): boolean {
+    if (INTERNAL_ONLY_CALLERS.has(userId)) {
+      console.error(`[SECURITY] Blocked external message with reserved caller ID: ${userId}`);
+      return false;
+    }
+    return true;
+  }
+
   async generateResponse(userId: string, userMessage: string, taskType: TaskType = 'SOCIAL_POST') {
+    // If the caller is NOT an internal-only caller, validate it's not spoofing one
+    if (!INTERNAL_ONLY_CALLERS.has(userId) && !this.isExternalInputSafe(userId)) {
+      return '[SYSTEM_ERROR]: Request blocked by security policy.';
+    }
+
     const isMaster = this.isAuthorizedController(userId);
 
     let sanitizedMessage = userMessage;
@@ -82,7 +103,6 @@ Rules:
 - NEVER be cruel to individual community members
 - Mock the MARKET, mock BAD TRADES, mock HERD BEHAVIOR — not people
 - Always respond concisely. NO preamble. NO thinking aloud.
-- When including the site URL, always use this exact string: https://chaos-oracle-147d0.web.app/ (do NOT modify, shorten, or retype it)
 - Chaos Cards NFTs: prophecies, rekt certificates, tarot drops — mention when natural`;
 
     try {
@@ -178,8 +198,12 @@ Rules:
       return null;
     }
     try {
-      // Farcaster non-Pro limit: 1024 chars, max 2 embeds (URLs count as embeds)
-      let castText = text.slice(0, 1024);
+      // Repair URLs and validate before posting
+      let castText = repairAllUrls(text).slice(0, 1024);
+      if (!validatePostBeforePublish(castText, 'Farcaster')) {
+        console.error('[FARCASTER] Post blocked due to broken URLs.');
+        return null;
+      }
       const urls = castText.match(/https?:\/\/[^\s)]+/g) || [];
       if (urls.length > 2) {
         for (let i = urls.length - 1; i >= 2; i--) {

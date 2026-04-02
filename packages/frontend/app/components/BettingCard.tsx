@@ -25,9 +25,10 @@ interface BettingCardProps {
   totalYes: bigint;
   totalNo: bigint;
   ethPool: bigint;
+  referralCode?: string | null;
 }
 
-export default function BettingCard({ id, version, contract, question, totalYes, totalNo, ethPool }: BettingCardProps) {
+export default function BettingCard({ id, version, contract, question, totalYes, totalNo, ethPool, referralCode }: BettingCardProps) {
   const [amount, setAmount] = useState('0.01');
   const [expanded, setExpanded] = useState(false);
   const { isConnected } = useAccount();
@@ -43,6 +44,20 @@ export default function BettingCard({ id, version, contract, question, totalYes,
 
   const placeBet = (betYes: boolean) => {
     reset();
+    // Track referral attribution for off-chain growth engine
+    if (referralCode) {
+      try {
+        const existing = JSON.parse(localStorage.getItem('chaos_referral_bets') || '[]');
+        existing.push({
+          marketId: id,
+          betYes,
+          amount,
+          referralCode,
+          timestamp: Date.now(),
+        });
+        localStorage.setItem('chaos_referral_bets', JSON.stringify(existing.slice(-100)));
+      } catch {}
+    }
     writeContract({
       address: contract as `0x${string}`,
       abi: PLACE_BET_ABI,

@@ -21,6 +21,11 @@ const BettingCard = dynamic(
   { ssr: false }
 );
 
+const Leaderboard = dynamic(
+  () => import('./components/Leaderboard'),
+  { ssr: false }
+);
+
 // --- CONFIGURATION ---
 const CONTRACT_V1 = '0x591A48064c1DB035B1562d60ed27cE18B48Bd228';
 const CONTRACT_V2 = '0x1b60e2C970Fe6e64c6e067130FF4Ae8a713E93b6';
@@ -80,6 +85,23 @@ const ABI_V2 = [
 export default function LandingPage() {
   const [markets, setMarkets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+
+  // Capture referral code from URL on mount (before wallet connection)
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get('ref');
+      if (ref && ref.trim()) {
+        localStorage.setItem('chaos_referral_code', ref.trim());
+        setReferralCode(ref.trim());
+      } else {
+        // Load previously stored referral code
+        const stored = localStorage.getItem('chaos_referral_code');
+        if (stored) setReferralCode(stored);
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     async function fetchMarkets() {
@@ -208,10 +230,19 @@ export default function LandingPage() {
                   totalYes={m.totalYes}
                   totalNo={m.totalNo}
                   ethPool={m.ethPool}
+                  referralCode={referralCode}
                 />
               ))}
             </div>
           )}
+          {/* Leaderboard Section */}
+          <div style={{ marginTop: '3rem', borderTop: '1px solid #333', paddingTop: '2rem' }}>
+            <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem', borderLeft: '4px solid #ff4500', paddingLeft: '1rem' }}>
+              TOP_PREDICTORS
+            </h3>
+            <Leaderboard />
+          </div>
+
           <div style={{ marginTop: '3rem', borderTop: '1px solid #333', paddingTop: '2rem' }}>
               <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>CREATE_NEW_MARKET</h3>
               <DeployMarketForm />

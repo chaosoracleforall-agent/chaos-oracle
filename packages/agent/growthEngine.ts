@@ -317,10 +317,22 @@ function now(): number {
 }
 
 function rewardTierForStreak(streak: number): RewardTier {
-  if (streak >= 5) return 'OracleSpeaks';
-  if (streak >= 3) return 'ChaosTarot';
+  if (streak >= 30) return 'OracleSpeaks';
+  if (streak >= 7) return 'ChaosTarot';
+  if (streak >= 3) return 'ChaosDisciple';
   return 'Prophecy';
 }
+
+/** Daily streak bonus multiplier applied to win points */
+function streakBonusMultiplier(streak: number): number {
+  if (streak >= 30) return 5;
+  if (streak >= 7) return 2;
+  if (streak >= 3) return 1.5;
+  return 1;
+}
+
+/** Streak milestones that trigger NFT mints */
+const STREAK_NFT_MILESTONES = [3, 5, 7, 10, 15, 20, 30, 50, 100];
 
 function currentCampaignDescription(type: CampaignType): string {
   switch (type) {
@@ -466,6 +478,8 @@ class GrowthEngine {
     const campaignType = this.state.campaigns.current?.type;
     let points = 25 + Math.max(0, currentStreak - 1) * 10;
     if (campaignType === 'STREAK_SURGE') points += 15;
+    // Apply daily streak bonus multiplier: 3-day=1.5x, 7-day=2x, 30-day=5x
+    points = Math.round(points * streakBonusMultiplier(currentStreak));
     return points;
   }
 
@@ -638,18 +652,37 @@ class GrowthEngine {
   private awardStreakMilestone(userId: string, wallet: string, streak: number): void {
     const key = `streak-${streak}:${wallet}`;
     if (this.state.rewards[key]) return;
+
+    const tier = rewardTierForStreak(streak);
+    const multiplier = streakBonusMultiplier(streak);
+    const streakLabel = streak >= 30 ? 'LEGENDARY' : streak >= 7 ? 'EPIC' : streak >= 3 ? 'RISING' : 'INITIATE';
+
     this.queueReward(
       userId,
       wallet,
       key,
-      `Win Streak x${streak}`,
-      `You hit a ${streak}-market win streak. Keep pressing the oracle edge.`,
-      rewardTierForStreak(streak),
+      `${streakLabel} Streak x${streak}`,
+      `You hit a ${streak}-market win streak (${multiplier}x bonus active). The oracle rewards persistence.`,
+      tier,
       {
         Reward: 'Win Streak',
         Streak: String(streak),
+        BonusMultiplier: `${multiplier}x`,
+        StreakTier: streakLabel,
       }
     );
+
+    // Notify user about streak bonus activation at tier boundaries
+    if ([3, 7, 30].includes(streak)) {
+      this.queueNotification(
+        userId,
+        [
+          `STREAK BONUS ACTIVATED: ${multiplier}x`,
+          `Your ${streak}-win streak now earns ${multiplier}x points per win.`,
+          streak < 30 ? `Next bonus tier: ${streak < 7 ? '7-streak (2x)' : '30-streak (5x)'}` : 'Maximum bonus reached. You are the Oracle.',
+        ].join('\n')
+      );
+    }
   }
 
   private awardReferralConversion(referrerUserId: string, referrerWallet: string | undefined, referredWallet: string): void {
@@ -825,7 +858,8 @@ class GrowthEngine {
             if (!user.firstWinRewardIssued) {
               this.awardFirstWin(user.userId, walletProfile.wallet, position.question);
             }
-            if ([2, 3, 5].includes(walletProfile.currentStreak)) {
+            // Check all streak NFT milestones (3, 5, 7, 10, 15, 20, 30, 50, 100)
+            if (STREAK_NFT_MILESTONES.includes(walletProfile.currentStreak)) {
               this.awardStreakMilestone(user.userId, walletProfile.wallet, walletProfile.currentStreak);
             }
           }

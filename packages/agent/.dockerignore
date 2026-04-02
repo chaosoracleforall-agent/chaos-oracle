@@ -1,0 +1,8 @@
+node_modules
+.env
+*_state.json
+agent_status.json
+*.enc
+*.log
+*.pdf
+__tests__

@@ -4,20 +4,11 @@ import NFTEngine from './nftEngine';
 import SocialLearner from './socialLearner';
 import EngagementCollector from './engagementCollector';
 import { updateTwitterDiagnostics } from './socialDiagnostics';
+import { CANONICAL_URLS, repairAllUrls, detectBrokenUrls, sanitizePostText, injectUrlsPostGeneration, validatePostBeforePublish } from './urlUtils';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-const SITE_URL = 'https://chaos-oracle-147d0.web.app/';
-const DISCORD_INVITE_URL = 'https://discord.gg/9GAFZvXC';
 const URL_REGEX = /https?:\/\/[^\s]+/gi;
-// Regex patterns that detect truncated/broken URL fragments (negative lookahead ensures
-// they don't false-positive on the canonical URL)
-const BROKEN_URL_PATTERNS = [
-  /chaos-oracle-147d0\.web\.app?(?![/p])/i,   // "web.ap" or "web.a" but NOT "web.app/"
-  /chaos-oracle-147d0\.web\.(?!app)/i,          // "web." followed by anything other than "app"
-  /discord\.gg\/9GAFZvX(?!C)/i,                // truncated invite code
-  /\.web\.app\/\//,                             // double slash after domain
-];
 
 // ============ X COMPLIANCE LIMITS ============
 // Conservative limits to stay well within X automation guidelines
@@ -75,108 +66,6 @@ function getUsername(authorId: string, includes: any): string {
 function randomDelay(): Promise<void> {
   const delay = REPLY_DELAY_MIN_MS + Math.random() * (REPLY_DELAY_MAX_MS - REPLY_DELAY_MIN_MS);
   return new Promise(r => setTimeout(r, delay));
-}
-
-function repairAllUrls(text: string): string {
-  let result = text;
-
-  // 1. Catch any chaos-oracle domain variant (with or without protocol, any path/query)
-  //    and replace with canonical SITE_URL
-  result = result.replace(
-    /(?:https?:\/\/)?chaos-oracle-147d0\.web\.app[^\s)}\]]*(?:\/[^\s)}\]]*)*/gi,
-    SITE_URL
-  );
-
-  // 2. Catch truncated domain (e.g. "chaos-oracle-147d0.web.ap" or "chaos-oracle-147d0.web.")
-  result = result.replace(
-    /(?:https?:\/\/)?chaos-oracle-147d0\.web\.[a-z]*/gi,
-    SITE_URL
-  );
-
-  // 3. Catch any discord.gg invite link and normalize to canonical
-  result = result.replace(
-    /(?:https?:\/\/)?discord\.gg\/[A-Za-z0-9]+/gi,
-    DISCORD_INVITE_URL
-  );
-
-  // 4. Collapse duplicate URLs that ended up adjacent (LLM sometimes repeats)
-  const siteEscaped = SITE_URL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const discordEscaped = DISCORD_INVITE_URL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  result = result.replace(new RegExp(`(${siteEscaped})\\s*\\1`, 'g'), SITE_URL);
-  result = result.replace(new RegExp(`(${discordEscaped})\\s*\\1`, 'g'), DISCORD_INVITE_URL);
-
-  // 5. Fix double slashes (except in protocol)
-  result = result.replace(/([^:])\/\//g, '$1/');
-
-  return result;
-}
-
-function tweetHasBrokenUrls(text: string): string[] {
-  const issues: string[] = [];
-
-  for (const pattern of BROKEN_URL_PATTERNS) {
-    if (pattern.test(text)) {
-      issues.push(`broken URL pattern matched: ${pattern}`);
-    }
-  }
-
-  // Check for site URL without trailing slash (renders differently on some clients)
-  if (/chaos-oracle-147d0\.web\.app(?!\/)/i.test(text)) {
-    issues.push('site URL missing trailing slash');
-  }
-
-  // Check for any http(s) URL that isn't one of our known-good URLs
-  const allUrls = text.match(URL_REGEX) || [];
-  for (const url of allUrls) {
-    const cleaned = url.replace(/[)\],.!?;:]+$/g, '');
-    if (
-      cleaned !== SITE_URL &&
-      cleaned !== DISCORD_INVITE_URL &&
-      !cleaned.startsWith(SITE_URL) &&
-      /chaos-oracle/i.test(cleaned)
-    ) {
-      issues.push(`non-canonical site URL: ${cleaned}`);
-    }
-  }
-
-  return issues;
-}
-
-function sanitizeTweetText(text: string, maxLen: number = 280): string {
-  let normalized = text.replace(/\s+/g, ' ').trim();
-
-  // Aggressively repair all known URLs to canonical form
-  normalized = repairAllUrls(normalized);
-
-  // Strip trailing punctuation glued to URLs
-  normalized = normalized.replace(URL_REGEX, (url) => {
-    const cleaned = url.replace(/[)\],.!?;:]+$/g, '');
-    if (/chaos-oracle-147d0\.web\.app/i.test(cleaned)) return SITE_URL;
-    if (/discord\.gg\/9GAFZvXC/i.test(cleaned)) return DISCORD_INVITE_URL;
-    return cleaned;
-  });
-
-  if (normalized.length <= maxLen) {
-    return normalized;
-  }
-
-  // Truncation: never cut through a URL
-  const matches = [...normalized.matchAll(new RegExp(URL_REGEX.source, 'gi'))];
-  let cutIndex = maxLen;
-  const overlappingMatch = matches.find((match) => {
-    const start = match.index ?? -1;
-    const end = start + match[0].length;
-    return start >= 0 && start < cutIndex && cutIndex < end;
-  });
-
-  if (overlappingMatch?.index !== undefined) {
-    cutIndex = overlappingMatch.index;
-  }
-
-  let trimmed = normalized.slice(0, cutIndex).trim();
-  trimmed = trimmed.replace(/[\s,.;:!?-]+$/g, '').trim();
-
-  return trimmed || normalized.slice(0, maxLen).trim();
 }
 
 function extractUrls(text: string): string[] {
@@ -257,7 +146,7 @@ class TwitterAgent {
       warnings.push(`tweet length ${tweetText.length} exceeds 280`);
     }
 
-    const urlIssues = tweetHasBrokenUrls(tweetText);
+    const urlIssues = detectBrokenUrls(tweetText);
     warnings.push(...urlIssues);
 
     return { ok: warnings.length === 0, warnings };
@@ -398,7 +287,7 @@ class TwitterAgent {
       const claimText = `\n\nClaim your Prophecy NFT: ${prophecy.claimURL}`;
       const maxProphecyLen = Math.max(0, 280 - claimText.length);
       const truncatedProphecy = prophecy.prophecyText.slice(0, maxProphecyLen);
-      const replyText = sanitizeTweetText(`${truncatedProphecy}${claimText}`, 280);
+      const replyText = sanitizePostText(`${truncatedProphecy}${claimText}`, 280);
       this.logTweetDiagnostics(`prophecy reply for @${username}`, replyText);
 
       const validation = this.validateTweetPayload(replyText);
@@ -431,7 +320,7 @@ class TwitterAgent {
 
     try {
       const client = getTwitterClient();
-      const tweetText = sanitizeTweetText(text, 280);
+      const tweetText = sanitizePostText(text, 280);
       this.logTweetDiagnostics('custom tweet', tweetText);
 
       const validation = this.validateTweetPayload(tweetText);
@@ -462,15 +351,13 @@ class TwitterAgent {
     try {
       const client = getTwitterClient();
       const includeDiscord = Math.random() < 0.3;
-      const discordCTA = includeDiscord ? ` Include this exact Discord link: ${DISCORD_INVITE_URL}` : '';
       const prompt = `Generate a unique post for X/Twitter as the Chaos Oracle, an autonomous AI prediction market on Base.
-        You MUST include this exact URL (copy-paste it exactly): ${SITE_URL}${discordCTA}
-        CRITICAL: Do NOT modify, shorten, or retype the URL — use it exactly as shown above.
-        Keep it under 260 characters. Be witty, insightful, and on-brand (terminal/oracle aesthetic).
+        Keep it under 220 characters. Be witty, insightful, and on-brand (terminal/oracle aesthetic).
         Mix up the style — sometimes market commentary, sometimes philosophical, sometimes a bold prediction.
         Never be spammy, repetitive, or use excessive hashtags. Max 2 hashtags.`;
       const post = await ChaosBrain.generateResponse("SYSTEM_INTERNAL", prompt);
-      const tweetText = sanitizeTweetText(post, 280);
+      const withUrls = injectUrlsPostGeneration(post, { siteUrl: true, discordUrl: includeDiscord, maxLen: 280 });
+      const tweetText = sanitizePostText(withUrls, 280);
       this.logTweetDiagnostics('manifesto tweet', tweetText);
 
       const validation = this.validateTweetPayload(tweetText);

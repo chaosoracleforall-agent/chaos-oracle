@@ -1,5 +1,35 @@
 # Changelog
 
+## [4.0.0] - 2026-04-02
+
+### Added
+- **Monorepo structure** — Unified frontend, agent, and contracts into `packages/{frontend,agent,contracts}` with npm workspaces. Full git history preserved for frontend.
+- **PredictionMarketFactoryV3 contract** — Upgradeable agent wallet, market deadlines, 24h resolution dispute window, on-chain pause/circuit breaker, CHAOS-gated market creation, tiered creation fees (standard 0.001 ETH / featured 0.01 ETH), adjustable fee split, bet reclamation after expired deadlines. 79 tests passing.
+- **Shared URL utility** (`packages/agent/urlUtils.ts`) — Centralized URL repair, validation, and post-generation injection. Single source of truth for all canonical URLs.
+- **Leaderboard component** (`packages/frontend/app/components/Leaderboard.tsx`) — Top 10 predictors by volume with win rates, reading on-chain PlaceBet events.
+- **Referral tracking** — `?ref=` query param captured in frontend localStorage before wallet connection, passed through to BettingCard for attribution.
+- **Base ecosystem content type** — New `BASE_ECOSYSTEM` content strategy (15% weight) for organic Base DeFi community engagement.
+- **Streak gamification** — 3-day (1.5x), 7-day (2x), 30-day (5x) point multipliers with automated NFT milestone rewards.
+- **Structured logger** (`packages/agent/logger.ts`) — Typed severity levels, module tags, timestamps.
+- **Agent test suite** — 40 tests (vitest): URL utils, kill switch, secrets manager.
+- **Agent Dockerfile** — Production-ready containerization for `packages/agent/`.
+- **Premium NFT claiming** — OracleSpeaks tier at 0.001 ETH with pro-quality generation.
+
+### Changed
+- **Secrets manager hardened** — Critical secrets (private key, API tokens) now abort startup if missing in production. Silent GCP fallback eliminated. Failures logged with secret name.
+- **Master controller hardened** — Internal-only caller IDs (`SYSTEM_INTERNAL`, `CLAUDE_CODE`) blocked from external message handlers.
+- **URL posting fixed across all agents** — Twitter, Discord, Reddit, Farcaster, and Moltbook all use shared `urlUtils.ts`. LLM prompts no longer contain URL instructions; URLs injected post-generation. Broken URL gate blocks posting.
+- **npm dependencies pinned** — All 9 `"latest"` deps replaced with exact versions (axios 1.13.6, ethers 6.16.0, viem 2.47.0, etc.).
+- **20 silent catch blocks fixed** — Across 9 agent files, all empty catches now log errors with module name.
+- **Farcaster Frame enhanced** — Live market odds display, YES/NO percentage buttons, latest market auto-fetch.
+- **Content strategy rebalanced** — Market Alpha 25%, AI Humor 21%, Community 17%, Base Ecosystem 15%, Product CTA 13%, Savage Roast 9%.
+
+### Security
+- `.env.example` created with placeholder values; real `.env` excluded from repo via `.gitignore`.
+- Agent startup aborts unconditionally if `AGENT_PRIVATE_KEY` missing (any environment).
+- V3 contract adds dispute window, pause mechanism, and reclamation to protect user funds.
+- Prompt injection defense preserved for non-master users; internal caller spoofing blocked.
+
 ## [3.0.1] - 2026-03-12
 
 ### Changed

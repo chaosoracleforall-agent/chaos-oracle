@@ -109,7 +109,7 @@ class EmailAgent {
         if (resolved) return;
         resolved = true;
         clearTimeout(timer);
-        try { imap.end(); } catch {}
+        try { imap.end(); } catch (err) { console.warn('[EMAIL_AGENT] Failed to close IMAP connection:', err instanceof Error ? err.message : err); }
         resolve(val);
       };
 

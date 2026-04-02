@@ -54,7 +54,9 @@ class MoltbookAgent {
       if (fs.existsSync(this.statePath)) {
         return JSON.parse(fs.readFileSync(this.statePath, 'utf-8'));
       }
-    } catch {}
+    } catch (err) {
+      console.warn('[MOLTBOOK] Failed to load state file:', err instanceof Error ? err.message : err);
+    }
     return {
       registered: false,
       claimed: false,
@@ -309,7 +311,9 @@ class MoltbookAgent {
           await this.comment(post.id, reply);
           console.log(`[MOLTBOOK] Commented on "${post.title.slice(0, 50)}..."`);
         }
-      } catch {}
+      } catch (err) {
+        console.error('[MOLTBOOK] Failed to comment on post:', err instanceof Error ? err.message : err);
+      }
     } else if (relevance >= 1) {
       await this.upvote(post.id);
     }

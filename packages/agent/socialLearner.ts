@@ -49,7 +49,9 @@ class SocialLearner {
         if (!loaded.contentRegistry) loaded.contentRegistry = [];
         return loaded;
       }
-    } catch {}
+    } catch (err) {
+      console.warn('[SOCIAL_LEARNER] Failed to load state file:', err instanceof Error ? err.message : err);
+    }
     return {
       totalInteractions: 0,
       topPerformingContent: [],

@@ -61,7 +61,9 @@ class NFTReportAgent {
         // Extract balance from health check issues if low
         const balIssue = health.issues.find(i => i.includes('balance'));
         if (balIssue) walletBalance = balIssue;
-      } catch {}
+      } catch (err) {
+        console.warn('[NFT_REPORT] Failed to get NFT health check:', err instanceof Error ? err.message : err);
+      }
     } else {
       campaignStatus = 'NOT CONFIGURED';
       onChainStats = '  NFT Engine not ready (missing env vars)';

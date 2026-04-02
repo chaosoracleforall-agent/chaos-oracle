@@ -3,6 +3,7 @@ import { spawnSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import { generateContent } from './modelRouter';
+import { CANONICAL_URLS, validatePostBeforePublish } from './urlUtils';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -284,7 +285,7 @@ BODY: [body]`,
       announcement: `Write a Reddit post for r/${subreddit} about Chaos Oracle, an AI-powered prediction market on Base.
 Focus on what makes it technically interesting: autonomous AI agent, on-chain markets, token burn mechanics.
 Be informative and genuine — Reddit downvotes pure shilling.
-You may include https://chaos-oracle-147d0.web.app/ and Discord https://discord.gg/9GAFZvXC since this is an announcement.
+You may include ${CANONICAL_URLS.site} and Discord ${CANONICAL_URLS.discord} since this is an announcement.
 ${recentPosts ? `Avoid similar topics to: ${recentPosts}` : ''}
 Format:
 TITLE: [title]
@@ -353,11 +354,19 @@ BODY: [comment]`,
       }
 
       if (postType === 'comment_engagement') {
+        if (!validatePostBeforePublish(content.body, 'Reddit')) {
+          console.warn('[REDDIT_AGENT] Comment blocked due to broken URLs.');
+          return;
+        }
         await this.engageWithComments(subreddit, content.body);
       } else if (!content.title) {
         console.warn('[REDDIT_AGENT] LLM returned empty title. Skipping post.');
         return;
       } else {
+        if (!validatePostBeforePublish(content.body, 'Reddit')) {
+          console.warn('[REDDIT_AGENT] Post blocked due to broken URLs.');
+          return;
+        }
         await this.submitPost(subreddit, content.title, content.body, postType);
       }
     } catch (error: any) {
@@ -528,7 +537,7 @@ BODY: [your reply]`);
             });
           }
 
-          try { await (msg as any).markAsRead(); } catch {}
+          try { await (msg as any).markAsRead(); } catch (err) { console.warn('[REDDIT_AGENT] Failed to mark message as read:', err instanceof Error ? err.message : err); }
           continue;
         }
 
@@ -542,7 +551,7 @@ BODY: [your reply]`);
               this.state.bannedSubreddits.push(subName);
             }
           }
-          try { await (msg as any).markAsRead(); } catch {}
+          try { await (msg as any).markAsRead(); } catch (err) { console.warn('[REDDIT_AGENT] Failed to mark message as read:', err instanceof Error ? err.message : err); }
           continue;
         }
 
@@ -551,7 +560,7 @@ BODY: [your reply]`);
             body.includes('self-promotion') || body.includes('guidelines')) {
           console.log(`[REDDIT_AGENT] Mod warning from ${subreddit}: ${msg.subject}`);
           actions.push(`MOD_WARNING: ${subreddit} — "${msg.subject}": ${body.slice(0, 200)}`);
-          try { await (msg as any).markAsRead(); } catch {}
+          try { await (msg as any).markAsRead(); } catch (err) { console.warn('[REDDIT_AGENT] Failed to mark message as read:', err instanceof Error ? err.message : err); }
           continue;
         }
 
@@ -575,7 +584,7 @@ BODY: [your reply]`
           } catch (replyErr: any) {
             console.error(`[REDDIT_AGENT] Inbox reply failed:`, replyErr.message);
           }
-          try { await (msg as any).markAsRead(); } catch {}
+          try { await (msg as any).markAsRead(); } catch (err) { console.warn('[REDDIT_AGENT] Failed to mark message as read:', err instanceof Error ? err.message : err); }
         }
       }
 

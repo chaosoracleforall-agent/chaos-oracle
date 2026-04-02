@@ -67,7 +67,9 @@ function loadState(): CampaignState {
     if (fs.existsSync(STATE_FILE)) {
       return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
     }
-  } catch {}
+  } catch (err) {
+    console.warn('[NFT_ENGINE] Failed to load campaign state:', err instanceof Error ? err.message : err);
+  }
   return {
     totalMinted: 0,
     dailyMints: {},
@@ -719,6 +721,107 @@ class NFTEngine {
     }
   }
 
+  // ============ PREMIUM (PAID) CLAIMING ============
+
+  /**
+   * Create a premium claim for the OracleSpeaks tier (tier 5, the highest).
+   * Requires payment of 0.001 ETH. Generates a claim code that the recipient
+   * can redeem on-chain via the ChaosCards contract's claim() function.
+   *
+   * @param recipient - Wallet address of the recipient
+   * @param tier - NFT tier (defaults to OracleSpeaks for premium)
+   * @param price - Price in ETH (defaults to 0.001 ETH for OracleSpeaks)
+   * @returns Claim code, claim URL, metadata URI, and price charged — or null on failure
+   */
+  async createPremiumClaim(
+    recipient: `0x${string}`,
+    tier: TierName = 'OracleSpeaks',
+    price: string = '0.001'
+  ): Promise<{
+    claimCode: string;
+    claimURL: string;
+    metadataURI: string;
+    pricePaid: string;
+    tier: TierName;
+  } | null> {
+    if (!this.isReady()) return null;
+    if (!this.canMintToday()) {
+      console.log('[NFT_ENGINE] Daily mint limit reached.');
+      return null;
+    }
+
+    // Only OracleSpeaks (tier 4 / highest) is supported for premium at launch
+    if (tier === 'OracleSpeaks' && !this.canMintMythic()) {
+      console.log('[NFT_ENGINE] Weekly mythic (OracleSpeaks) limit reached.');
+      return null;
+    }
+
+    try {
+      // 1. Generate premium-tier image
+      const imagePrompt = `${TIER_PROMPTS[tier]}, premium exclusive limited edition, golden accents, holographic shimmer effect`;
+      const imageBuffer = await this.generateImage(imagePrompt, 'pro'); // Use pro quality for premium
+      if (!imageBuffer) return null;
+
+      // 2. Upload image to IPFS
+      const imageCID = await this.uploadToIPFS(imageBuffer, `premium-${tier}-${Date.now()}.png`);
+      if (!imageCID) return null;
+
+      // 3. Create metadata
+      const tokenNumber = this.state.totalMinted;
+      const metadata = this.createMetadata({
+        name: `${tier === 'OracleSpeaks' ? "The Oracle Speaks" : tier} #${tokenNumber}`,
+        description: `Premium Chaos Card — ${tier}. This exclusive NFT was minted for ${price} ETH. The Oracle's highest honor, reserved for true believers in chaos.`,
+        imageCID,
+        tier,
+        trigger: `Premium Mint (${price} ETH)`,
+        extra: {
+          Edition: 'Premium',
+          'Price Paid': `${price} ETH`,
+          Recipient: recipient,
+        },
+      });
+
+      // 4. Upload metadata to IPFS
+      const metadataURI = await this.uploadToIPFS(metadata, `premium-${tier}-${Date.now()}-metadata.json`);
+      if (!metadataURI) return null;
+
+      // 5. Create claim on-chain (the claim() function on ChaosCards handles payment verification)
+      const claimCode = this.generateClaimCode();
+      const success = await this.createClaimOnChain(claimCode, metadataURI, tier);
+      if (!success) return null;
+
+      // 6. Track mythic mints
+      if (tier === 'OracleSpeaks') {
+        this.recordMythicMint();
+      }
+
+      console.log(`[NFT_ENGINE] Premium claim created: ${claimCode} (${tier}) for ${recipient} at ${price} ETH`);
+
+      return {
+        claimCode,
+        claimURL: this.getClaimURL(claimCode),
+        metadataURI,
+        pricePaid: price,
+        tier,
+      };
+    } catch (err: any) {
+      console.error('[NFT_ENGINE] Premium claim creation failed:', err.message);
+      this.logError(`Premium claim failed (${tier} for ${recipient}): ${err.message}`);
+      return null;
+    }
+  }
+
+  /**
+   * Get the price for a premium NFT tier in ETH.
+   * Currently only OracleSpeaks (tier 5) has a premium price.
+   */
+  getPremiumPrice(tier: TierName): string | null {
+    const PREMIUM_PRICES: Partial<Record<TierName, string>> = {
+      OracleSpeaks: '0.001',
+    };
+    return PREMIUM_PRICES[tier] || null;
+  }
+
   // ============ CAMPAIGN CONTROL ============
 
   async toggleCampaign(): Promise<boolean> {
@@ -799,7 +902,9 @@ class NFTEngine {
         const balance = await this.client.getBalance({ address: this.account!.address });
         const ethBalance = Number(balance) / 1e18;
         if (ethBalance < 0.001) issues.push(`Low agent balance: ${ethBalance.toFixed(6)} ETH`);
-      } catch {}
+      } catch (err) {
+        console.warn('[NFT_ENGINE] Failed to check agent balance:', err instanceof Error ? err.message : err);
+      }
     }
 
     const recentErrors = this.state.errors.filter(e => Date.now() - e.timestamp < 3600000);

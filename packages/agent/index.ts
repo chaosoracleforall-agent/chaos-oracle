@@ -106,7 +106,7 @@ async function main() {
         } catch (err) {
           console.error("[AGENT] Growth intelligence error:", err);
           // Fallback to legacy strategic growth
-          try { await executeStrategicGrowth(); } catch {}
+          try { await executeStrategicGrowth(); } catch (err) { console.error('[AGENT] Strategic growth fallback error:', err instanceof Error ? err.message : err); }
         }
         setTimeout(runStratLoop, stratInterval());
       };
@@ -223,7 +223,7 @@ async function main() {
             // Auto-pause if >10 errors in last hour or balance critically low
             if (health.issues.some(i => i.includes('errors in last hour') || i.includes('Low agent balance'))) {
               console.error('[NFT_CAMPAIGN] AUTO-PAUSING campaign due to critical issues.');
-              try { await NFTEngine.toggleCampaign(); } catch {}
+              try { await NFTEngine.toggleCampaign(); } catch (err) { console.error('[AGENT] NFT campaign toggle error:', err instanceof Error ? err.message : err); }
             }
           } else {
             const stats = await NFTEngine.getCampaignStats();
@@ -253,7 +253,7 @@ async function main() {
             try {
               const tarotHash = await ChaosBrain.postFarcasterCast(announcement);
               if (tarotHash) EngagementCollector.trackPost('farcaster', announcement, tarotHash);
-            } catch {}
+            } catch (err) { console.error('[AGENT] Tarot Farcaster post error:', err instanceof Error ? err.message : err); }
             console.log(`[NFT_CAMPAIGN] Tarot drop: ${tarot.cardName}, ${tarot.claimCodes.length} claims ready`);
           }
         } catch (err) {
@@ -353,14 +353,14 @@ async function main() {
 
           if (result.campaignAnnouncement) {
             await DiscordAgent.broadcastGrowthUpdate('CHAOS GROWTH CAMPAIGN', result.campaignAnnouncement);
-            try { await TwitterAgent.postCustomTweet(result.campaignAnnouncement.replace(/\n/g, ' | ')); } catch {}
-            try { await ChaosBrain.postFarcasterCast(result.campaignAnnouncement); } catch {}
+            try { await TwitterAgent.postCustomTweet(result.campaignAnnouncement.replace(/\n/g, ' | ')); } catch (err) { console.error('[AGENT] Campaign tweet error:', err instanceof Error ? err.message : err); }
+            try { await ChaosBrain.postFarcasterCast(result.campaignAnnouncement); } catch (err) { console.error('[AGENT] Campaign Farcaster post error:', err instanceof Error ? err.message : err); }
           }
 
           if (result.leaderboardAnnouncement) {
             await DiscordAgent.broadcastGrowthUpdate('CHAOS LEADERBOARD', result.leaderboardAnnouncement);
-            try { await TwitterAgent.postCustomTweet(result.leaderboardAnnouncement.replace(/\n/g, ' | ')); } catch {}
-            try { await ChaosBrain.postFarcasterCast(result.leaderboardAnnouncement); } catch {}
+            try { await TwitterAgent.postCustomTweet(result.leaderboardAnnouncement.replace(/\n/g, ' | ')); } catch (err) { console.error('[AGENT] Leaderboard tweet error:', err instanceof Error ? err.message : err); }
+            try { await ChaosBrain.postFarcasterCast(result.leaderboardAnnouncement); } catch (err) { console.error('[AGENT] Leaderboard Farcaster post error:', err instanceof Error ? err.message : err); }
           }
         } catch (err) {
           console.error('[AGENT] Growth engine loop error:', err);

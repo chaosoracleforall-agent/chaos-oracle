@@ -7,6 +7,7 @@ import SocialLearner from './socialLearner';
 import EngagementCollector from './engagementCollector';
 import GrowthEngine from './growthEngine';
 import { formatSocialDiagnostics, readSocialDiagnostics, resetSocialDiagnostics, updateDiscordDiagnostics } from './socialDiagnostics';
+import { CANONICAL_URLS, injectUrlsPostGeneration, validatePostBeforePublish } from './urlUtils';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -404,14 +405,14 @@ class DiscordAgent {
       }) as bigint;
 
       if (count === BigInt(0)) {
-        await message.reply('```\n[CHAOS_ORACLE] NO_MARKETS_FOUND. Deploy one at https://chaos-oracle-147d0.web.app/\n```');
+        await message.reply(`\`\`\`\n[CHAOS_ORACLE] NO_MARKETS_FOUND. Deploy one at ${CANONICAL_URLS.site}\n\`\`\``);
         return;
       }
 
       const embed = new EmbedBuilder()
         .setColor(0xff4500)
         .setTitle('CHAOS ORACLE: ACTIVE_MARKETS')
-        .setURL('https://chaos-oracle-147d0.web.app/')
+        .setURL(CANONICAL_URLS.site)
         .setTimestamp();
 
       const marketCount = Math.min(Number(count), 5); // Show latest 5
@@ -480,7 +481,7 @@ class DiscordAgent {
         { name: '!diag reset', value: 'Reset diagnostics (admin only)', inline: true },
         { name: '@ChaosOracle', value: 'Talk to me (if you dare)', inline: false },
       )
-      .setURL('https://chaos-oracle-147d0.web.app/')
+      .setURL(CANONICAL_URLS.site)
       .setFooter({ text: 'PROTOCOL_VERSION: 2.0 | SOVEREIGNTY: ABSOLUTE' });
 
     await this.safeReply(message, { embeds: [embed] }, 'help command');
@@ -620,7 +621,7 @@ class DiscordAgent {
           .setColor(0xff4500)
           .setTitle(`NEW_MARKET_DEPLOYED: #${marketId}`)
           .setDescription(question)
-          .setURL('https://chaos-oracle-147d0.web.app/')
+          .setURL(CANONICAL_URLS.site)
           .addFields(
             { name: 'Action', value: 'Place your bets now', inline: true },
             { name: 'Network', value: 'Base Mainnet', inline: true },
@@ -646,13 +647,15 @@ class DiscordAgent {
           `Generate a short, engaging Discord message to spark discussion.
            Pick ONE of these formats randomly:
            - A hot take on a current crypto/prediction market topic
-           - A market analysis teaser that drives people to https://chaos-oracle-147d0.web.app/
+           - A market analysis teaser that drives people to ${CANONICAL_URLS.site}
            - A provocative question about crypto markets
            - A protocol update / alpha leak style message
-           Keep it under 300 characters. Include https://discord.gg/9GAFZvXC only if relevant.
+           Keep it under 300 characters. Include ${CANONICAL_URLS.discord} only if relevant.
            NEVER repeat previous messages.`);
 
-        const truncated = content.length > 1900 ? content.slice(0, 1900) + '...' : content;
+        let postText = injectUrlsPostGeneration(content, { siteUrl: true, maxLen: 2000 });
+        if (!validatePostBeforePublish(postText, 'Discord')) continue;
+        const truncated = postText.length > 1900 ? postText.slice(0, 1900) + '...' : postText;
 
         const embed = new EmbedBuilder()
           .setColor(0xff4500)
@@ -679,11 +682,12 @@ class DiscordAgent {
        Include:
        - Brief intro: Chaos Oracle is an AI-powered prediction market on Base
        - What we offer: cross-promotion, shared market creation, co-branded events
-       - Our links: https://chaos-oracle-147d0.web.app/ and https://discord.gg/9GAFZvXC
+       - Our links: ${CANONICAL_URLS.site} and ${CANONICAL_URLS.discord}
        - Keep the Chaos Oracle persona but stay professional enough for a partnership ask
        Keep it under 500 characters.`);
+    const outreachWithUrls = injectUrlsPostGeneration(outreach, { siteUrl: true, discordUrl: true, maxLen: 2000 });
     console.log(`[DISCORD_AGENT] Partnership outreach generated`);
-    return outreach;
+    return outreachWithUrls;
   }
 
   /**

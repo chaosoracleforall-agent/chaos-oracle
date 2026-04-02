@@ -28,7 +28,9 @@ class ReferralEngine {
       if (fs.existsSync(STATE_FILE)) {
         return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
       }
-    } catch {}
+    } catch (err) {
+      console.warn('[REFERRAL_ENGINE] Failed to load state file:', err instanceof Error ? err.message : err);
+    }
     return { referrals: [], airdropsSent: {} };
   }
 
