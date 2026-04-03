@@ -37,9 +37,9 @@ class GrowthIntelligence {
 
     // Social engagement from SocialLearner
     const learnerState = SocialLearner.getState();
-    metrics.totalPosts = learnerState.contentRegistry.length;
-    metrics.totalEngagements = learnerState.totalInteractions;
-    metrics.topContent = learnerState.topPerformingContent.length;
+    metrics.totalPosts = (learnerState.contentRegistry || []).length;
+    metrics.totalEngagements = learnerState.totalInteractions || 0;
+    metrics.topContent = (learnerState.topPerformingContent || []).length;
 
     for (const [platform, insight] of Object.entries(learnerState.platformInsights)) {
       MetricsStore.recordMetric('social', `${platform}_avg_engagement`, insight.avgEngagement);

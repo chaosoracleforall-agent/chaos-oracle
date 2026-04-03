@@ -65,7 +65,11 @@ class ContentStrategy {
   private loadState(): ContentState {
     try {
       if (fs.existsSync(STATE_FILE)) {
-        return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+        const loaded = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+        // Ensure arrays/objects exist (migration from older state files)
+        if (!Array.isArray(loaded.recentTypes)) loaded.recentTypes = [];
+        if (!loaded.typePerformance) loaded.typePerformance = {};
+        return loaded;
       }
     } catch (err) {
       console.warn('[CONTENT_STRATEGY] Failed to load state file:', err instanceof Error ? err.message : err);
