@@ -1,5 +1,25 @@
 # Changelog
 
+## [4.1.0] - 2026-04-03
+
+### Added
+- **Tweet dedup** — LLM prompts now include recent post history to prevent repetitive tweets and Farcaster casts.
+- **Reply dedup** — In-memory ring buffer of recent replies prevents repetitive response themes across users.
+- **Twitter thread support** — 20% chance to post 3-tweet threads instead of single tweets, using ContentStrategy for topic selection.
+- **Farcaster quote casts** — New 6-hour loop fetches trending crypto casts and posts witty commentary as quote casts (up to 2 per cycle).
+- **Proactive Farcaster likes** — Auto-likes all mentions before replying + 8 relevant trending casts per quote cast cycle.
+- **Discord emoji reactions** — Context-aware emoji reactions on keyword-matched messages before replying.
+- **Time-of-day posting optimization** — Calculates best posting hour per platform from engagement data; skips viralization cycles outside optimal windows (forces post if >8h silent).
+- **Cross-platform syndication** — 30% chance per viralization cycle to rephrase top-performing Farcaster content for Twitter.
+- **Streak shoutouts** — Win streaks >= 5 generate social posts broadcast to Twitter, Farcaster, and Discord.
+- **Dynamic content weight rebalancing** — ContentStrategy weights auto-adjust every 6 hours based on engagement performance (20% boost/reduction, capped at 5%-40%).
+- **GrowthIntelligence actions wired** — INCREASE_POSTING activates 12h posting boost (2h interval), COMMUNITY_EVENT auto-generates and broadcasts to Discord/Farcaster, ALERT_TEAM sends email notification.
+- **Twitter engagement estimation** — Indirect engagement collection via mention timeline reply counting (Free tier compatible).
+
+### Fixed
+- **ContentStrategy state migration** — Guard against missing `recentTypes` array in older state files on VM.
+- **GrowthIntelligence null safety** — Guard against undefined `contentRegistry` in SocialLearner state.
+
 ## [4.0.1] - 2026-04-02
 
 ### Changed
