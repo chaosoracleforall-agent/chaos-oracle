@@ -208,7 +208,7 @@ Rules:
     }
   }
 
-  async postFarcasterCast(text: string, replyTo?: string): Promise<string | null> {
+  async postFarcasterCast(text: string, replyTo?: string, channel?: string): Promise<string | null> {
     const SIGNER_UUID = process.env.NEYNAR_SIGNER_UUID;
     if (!SIGNER_UUID) {
       console.warn("[FARCASTER] No NEYNAR_SIGNER_UUID set. Farcaster posting disabled.");
@@ -230,6 +230,9 @@ Rules:
       const body: any = { signer_uuid: SIGNER_UUID, text: castText };
       if (replyTo) {
         body.parent = replyTo;
+      }
+      if (channel) {
+        body.channel_id = channel;
       }
       const response = await axios.post('https://api.neynar.com/v2/farcaster/cast', body, {
         headers: { 'x-api-key': NEYNAR_API_KEY }

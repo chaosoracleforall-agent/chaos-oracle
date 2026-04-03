@@ -90,8 +90,7 @@ async function main() {
         try {
           if (!KillSwitch.checkStatus()) return;
           await ChaosBrain.scanMentionsAndReply();
-          // TwitterAgent.scanMentionsAndReply() disabled — X Free tier lacks
-          // userMentionTimeline read access (403). Viralization loop still posts.
+          await TwitterAgent.scanMentionsAndReply();
         } catch (err) {
           console.error("[AGENT] Social engagement loop error:", err);
         }
@@ -431,7 +430,7 @@ async function main() {
               const hash = await ChaosBrain.quoteCast(cast.hash, cast.author?.fid || 0, commentary);
               if (hash) {
                 EngagementCollector.trackPost('farcaster', commentary, hash);
-                SocialLearner.registerPost('farcaster', commentary, hash);
+                SocialLearner.registerPost('farcaster', commentary, hash, 'quote_cast');
                 quoted++;
               }
             } catch (err) {
@@ -523,8 +522,20 @@ async function executeSocialViralization() {
 
         const farcasterPost = await SocialLearner.generateOptimizedPost('farcaster');
         console.log(`[VIRALIZATION] Farcaster content: ${farcasterPost.slice(0, 100)}...`);
+
+        // 30% chance to post to a relevant Farcaster channel
+        let channel: string | undefined;
+        if (Math.random() < 0.3) {
+          const lc = farcasterPost.toLowerCase();
+          if (lc.includes('base') || lc.includes('l2') || lc.includes('coinbase')) channel = 'base';
+          else if (lc.includes('defi') || lc.includes('tvl') || lc.includes('liquidity')) channel = 'defi';
+          else if (lc.includes('predict') || lc.includes('bet') || lc.includes('market')) channel = 'prediction-markets';
+          else channel = 'crypto';
+          console.log(`[VIRALIZATION] Posting to Farcaster channel: /${channel}`);
+        }
+
         try {
-            const castHash = await ChaosBrain.postFarcasterCast(farcasterPost);
+            const castHash = await ChaosBrain.postFarcasterCast(farcasterPost, undefined, channel);
             if (castHash) {
               EngagementCollector.trackPost('farcaster', farcasterPost, castHash);
             }

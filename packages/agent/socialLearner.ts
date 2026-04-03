@@ -17,11 +17,14 @@ interface EngagementMetric {
   sentiment: 'positive' | 'negative' | 'neutral';
 }
 
+type PostFormat = 'single' | 'thread' | 'quote_cast';
+
 interface RegisteredPost {
   platform: 'twitter' | 'farcaster' | 'discord' | 'reddit';
   text: string;
   postId?: string;
   timestamp: string;
+  format?: PostFormat;
 }
 
 interface LearningState {
@@ -76,12 +79,13 @@ class SocialLearner {
    * Register an outbound post for tracking.
    * Called by agents after posting content.
    */
-  registerPost(platform: RegisteredPost['platform'], text: string, postId?: string) {
+  registerPost(platform: RegisteredPost['platform'], text: string, postId?: string, format?: PostFormat) {
     this.state.contentRegistry.push({
       platform,
       text,
       postId,
       timestamp: new Date().toISOString(),
+      format,
     });
     this.saveState();
     console.log(`[SOCIAL_LEARNER] Registered ${platform} post (${text.slice(0, 50)}...)`);
@@ -113,6 +117,14 @@ class SocialLearner {
       (sum, m) => sum + m.engagement.likes + m.engagement.replies + m.engagement.reposts, 0
     ) / Math.max(platformMetrics.length, 1);
 
+    // Track format performance (A/B: thread vs single vs quote_cast)
+    const matchingPost = this.state.contentRegistry.find(p =>
+      p.platform === metric.platform && p.text.slice(0, 80) === metric.content.slice(0, 80)
+    );
+    if (matchingPost?.format) {
+      ContentStrategy.recordFormatPerformance(matchingPost.format, totalEng);
+    }
+
     this.saveState();
   }
 
@@ -142,6 +154,14 @@ class SocialLearner {
       .map(([p, s]) => `${p}: avg engagement ${s.avgEngagement.toFixed(1)}`)
       .join(', ');
 
+    // Format A/B stats
+    const formatCounts: Record<string, number> = {};
+    for (const p of recentPosts) {
+      const fmt = p.format || 'single';
+      formatCounts[fmt] = (formatCounts[fmt] || 0) + 1;
+    }
+    const formatStats = Object.entries(formatCounts).map(([f, c]) => `${f}: ${c}`).join(', ') || 'no format data';
+
     const analysisPrompt = `INTERNAL ANALYSIS REQUEST (Learning Iteration #${this.state.learningIteration}):
 
 Analyzing Chaos Oracle's social media performance to improve engagement.
@@ -151,6 +171,7 @@ ${topContent.length > 0 ? `Top performing content (sorted by engagement):\n${eng
 ${postsSummary}
 
 Platform stats: ${platformStats || 'No platform data yet.'}
+Post format breakdown: ${formatStats}
 Total interactions tracked: ${this.state.totalInteractions}
 Total posts registered: ${this.state.contentRegistry.length}
 

@@ -52,7 +52,13 @@ class MoltbookAgent {
   private loadState(): MoltbookState {
     try {
       if (fs.existsSync(this.statePath)) {
-        return JSON.parse(fs.readFileSync(this.statePath, 'utf-8'));
+        const loaded = JSON.parse(fs.readFileSync(this.statePath, 'utf-8'));
+        // Migration guards for older state files
+        if (!Array.isArray(loaded.subscribedSubmolts)) loaded.subscribedSubmolts = [];
+        if (!Array.isArray(loaded.followedAgents)) loaded.followedAgents = [];
+        if (!Array.isArray(loaded.postHistory)) loaded.postHistory = [];
+        if (!Array.isArray(loaded.commentHistory)) loaded.commentHistory = [];
+        return loaded;
       }
     } catch (err) {
       console.warn('[MOLTBOOK] Failed to load state file:', err instanceof Error ? err.message : err);

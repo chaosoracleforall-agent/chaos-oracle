@@ -51,6 +51,7 @@ interface ContentState {
   recentTypes: { type: ContentType; platform: string; timestamp: number }[];
   typePerformance: Record<ContentType, { total: number; avgEngagement: number }>;
   adjustedWeights?: Record<ContentType, number>; // dynamically rebalanced weights
+  formatPerformance?: Record<string, { total: number; avgEngagement: number }>; // A/B format tracking
 }
 
 const STATE_FILE = path.join(__dirname, 'content_strategy_state.json');
@@ -162,6 +163,30 @@ class ContentStrategy {
     perf.avgEngagement = (perf.avgEngagement * perf.total + engagement) / (perf.total + 1);
     perf.total++;
     this.saveState();
+  }
+
+  /**
+   * Record engagement data for a post format (thread, single, quote_cast).
+   */
+  recordFormatPerformance(format: string, engagement: number) {
+    if (!this.state.formatPerformance) this.state.formatPerformance = {};
+    if (!this.state.formatPerformance[format]) {
+      this.state.formatPerformance[format] = { total: 0, avgEngagement: 0 };
+    }
+    const perf = this.state.formatPerformance[format];
+    perf.avgEngagement = (perf.avgEngagement * perf.total + engagement) / (perf.total + 1);
+    perf.total++;
+    this.saveState();
+  }
+
+  /**
+   * Get format performance stats for reporting.
+   */
+  getFormatStats(): string {
+    if (!this.state.formatPerformance) return 'No format data yet.';
+    return Object.entries(this.state.formatPerformance)
+      .map(([f, p]) => `${f}: ${p.total} posts, avg engagement ${p.avgEngagement.toFixed(1)}`)
+      .join(', ');
   }
 
   /**

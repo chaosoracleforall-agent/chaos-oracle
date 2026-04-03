@@ -159,8 +159,19 @@ class RedditAgent {
   }
 
   private loadState(): RedditState {
-    if (fs.existsSync(this.statePath)) {
-      return JSON.parse(fs.readFileSync(this.statePath, 'utf8'));
+    try {
+      if (fs.existsSync(this.statePath)) {
+        const loaded = JSON.parse(fs.readFileSync(this.statePath, 'utf8'));
+        // Migration guards for older state files
+        if (!loaded.lastPostPerSubreddit) loaded.lastPostPerSubreddit = {};
+        if (!Array.isArray(loaded.postHistory)) loaded.postHistory = [];
+        if (!Array.isArray(loaded.bannedSubreddits)) loaded.bannedSubreddits = [];
+        if (typeof loaded.totalPosts !== 'number') loaded.totalPosts = 0;
+        if (typeof loaded.totalComments !== 'number') loaded.totalComments = 0;
+        return loaded;
+      }
+    } catch (err) {
+      console.warn('[REDDIT_AGENT] Failed to load state file:', err instanceof Error ? err.message : err);
     }
     return {
       lastPostPerSubreddit: {},

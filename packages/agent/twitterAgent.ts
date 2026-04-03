@@ -176,6 +176,11 @@ class TwitterAgent {
 
   async scanMentionsAndReply() {
     try {
+      if (!SELF_USER_ID || !/^\d+$/.test(SELF_USER_ID)) {
+        console.error(`[X_AGENT] TWITTER_USER_ID missing or not numeric ("${SELF_USER_ID}"). Mention scanning disabled.`);
+        return;
+      }
+
       if (!this.canTweetToday()) {
         console.log(`[X_AGENT] Daily tweet limit reached (${MAX_TWEETS_PER_DAY}). Skipping scan.`);
         return;
@@ -251,8 +256,13 @@ class TwitterAgent {
       if (repliesSent > 0) {
         console.log(`[X_AGENT] Scan complete: ${repliesSent} replies sent. ${this.getDailyStats()}`);
       }
-    } catch (error) {
-      console.error("[X_AGENT] Mention scan error:", error);
+    } catch (error: any) {
+      const status = error?.code || error?.data?.status || error?.response?.status;
+      if (status === 403) {
+        console.error(`[X_AGENT] Mention scan 403 Forbidden — check API tier (Basic required) and TWITTER_USER_ID format. User ID: "${SELF_USER_ID}"`);
+      } else {
+        console.error("[X_AGENT] Mention scan error:", status || error?.message || error);
+      }
     }
   }
 
@@ -415,7 +425,7 @@ class TwitterAgent {
         lastTweetId = result?.data?.id;
         this.recordTweet();
         if (i === 0) {
-          SocialLearner.registerPost('twitter', tweetText, lastTweetId);
+          SocialLearner.registerPost('twitter', tweetText, lastTweetId, 'thread');
           EngagementCollector.trackPost('twitter', tweetText, lastTweetId);
         }
         this.logTweetDiagnostics(`thread tweet ${i + 1}/${tweets.length}`, tweetText);
