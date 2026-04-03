@@ -164,45 +164,53 @@ export default function LandingPage() {
         }
 
         // Fetch V2 markets
-        const v2Count = await client.readContract({
-          address: CONTRACT_V2,
-          abi: ABI_V2,
-          functionName: 'marketCount',
-        }) as bigint;
-
-        for (let i = Number(v2Count) - 1; i >= 0; i--) {
-          const data = await client.readContract({
+        try {
+          const v2Count = await client.readContract({
             address: CONTRACT_V2,
             abi: ABI_V2,
-            functionName: 'markets',
-            args: [BigInt(i)],
-          }) as any;
-          fetchedMarkets.push({
-            id: i, version: 'V2', contract: CONTRACT_V2,
-            question: data[0], totalYes: data[1], totalNo: data[2],
-            ethPool: data[5],
-          });
+            functionName: 'marketCount',
+          }) as bigint;
+
+          for (let i = Number(v2Count) - 1; i >= 0; i--) {
+            const data = await client.readContract({
+              address: CONTRACT_V2,
+              abi: ABI_V2,
+              functionName: 'markets',
+              args: [BigInt(i)],
+            }) as any;
+            fetchedMarkets.push({
+              id: i, version: 'V2', contract: CONTRACT_V2,
+              question: data[0], totalYes: data[1], totalNo: data[2],
+              ethPool: data[5],
+            });
+          }
+        } catch (v2Err) {
+          console.warn('V2 fetch failed:', v2Err);
         }
 
         // Fetch V1 markets (legacy)
-        const v1Count = await client.readContract({
-          address: CONTRACT_V1,
-          abi: ABI_V1,
-          functionName: 'marketCount',
-        }) as bigint;
-
-        for (let i = Number(v1Count) - 1; i >= 0; i--) {
-          const data = await client.readContract({
+        try {
+          const v1Count = await client.readContract({
             address: CONTRACT_V1,
             abi: ABI_V1,
-            functionName: 'markets',
-            args: [BigInt(i)],
-          }) as any;
-          fetchedMarkets.push({
-            id: i, version: 'V1', contract: CONTRACT_V1,
-            question: data[0], totalYes: data[1], totalNo: data[2],
-            ethPool: data[5],
-          });
+            functionName: 'marketCount',
+          }) as bigint;
+
+          for (let i = Number(v1Count) - 1; i >= 0; i--) {
+            const data = await client.readContract({
+              address: CONTRACT_V1,
+              abi: ABI_V1,
+              functionName: 'markets',
+              args: [BigInt(i)],
+            }) as any;
+            fetchedMarkets.push({
+              id: i, version: 'V1', contract: CONTRACT_V1,
+              question: data[0], totalYes: data[1], totalNo: data[2],
+              ethPool: data[5],
+            });
+          }
+        } catch (v1Err) {
+          console.warn('V1 fetch failed:', v1Err);
         }
 
         setMarkets(fetchedMarkets);

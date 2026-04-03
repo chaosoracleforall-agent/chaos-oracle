@@ -57,16 +57,16 @@ export default function Leaderboard() {
           ? currentBlock - 150000n
           : DEPLOY_BLOCK;
 
-        // Fetch BetPlaced events from V2 + V3
+        // Fetch BetPlaced events from V2 + V3 (graceful fallback on failure)
         const [v2BetLogs, v3BetLogs] = await Promise.all([
-          client.getLogs({ address: CONTRACT_V2 as `0x${string}`, event: BET_PLACED_EVENT, fromBlock, toBlock: currentBlock }),
+          client.getLogs({ address: CONTRACT_V2 as `0x${string}`, event: BET_PLACED_EVENT, fromBlock, toBlock: currentBlock }).catch(() => []),
           client.getLogs({ address: CONTRACT_V3 as `0x${string}`, event: BET_PLACED_EVENT, fromBlock, toBlock: currentBlock }).catch(() => []),
         ]);
         const betLogs = [...v2BetLogs, ...v3BetLogs];
 
-        // Fetch MarketResolved events from V2 + V3
+        // Fetch MarketResolved events from V2 + V3 (graceful fallback on failure)
         const [v2ResolveLogs, v3ResolveLogs] = await Promise.all([
-          client.getLogs({ address: CONTRACT_V2 as `0x${string}`, event: MARKET_RESOLVED_EVENT, fromBlock, toBlock: currentBlock }),
+          client.getLogs({ address: CONTRACT_V2 as `0x${string}`, event: MARKET_RESOLVED_EVENT, fromBlock, toBlock: currentBlock }).catch(() => []),
           client.getLogs({ address: CONTRACT_V3 as `0x${string}`, event: MARKET_RESOLVED_EVENT, fromBlock, toBlock: currentBlock }).catch(() => []),
         ]);
         const resolveLogs = [...v2ResolveLogs, ...v3ResolveLogs];

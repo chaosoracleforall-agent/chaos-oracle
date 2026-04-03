@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.2.1] - 2026-04-03
+
+### Fixed
+- **Markets not loading** — V2 and V1 market fetches now wrapped in individual try-catch blocks. A failure in one contract no longer prevents markets from other contracts from displaying.
+- **Leaderboard "Failed to load" error** — V2 event log fetches now have `.catch()` fallbacks matching V3. RPC failures no longer crash the entire leaderboard.
+- **Claim NFT page 404** — Created missing `/claim/page.tsx` route wrapping `ClaimContent` with dynamic import (SSR disabled for wagmi hooks).
+- **Bridge page 404** — Created `/bridge/page.tsx` with links to Base Bridge, Relay, and Orbiter Finance.
+- **vault.enc removed from git** — Encrypted vault file was tracked despite `.gitignore` rule; now properly excluded.
+
+### Security
+- Final security audit passed: git history clean, no hardcoded secrets, all credentials rotated, `.gitignore` comprehensive.
+
 ## [4.2.0] - 2026-04-03
 
 ### Added
