@@ -5,6 +5,7 @@ import { createPublicClient, http, formatEther, parseAbiItem } from 'viem';
 import { base } from 'viem/chains';
 
 const CONTRACT_V2 = '0x1b60e2C970Fe6e64c6e067130FF4Ae8a713E93b6';
+const CONTRACT_V3 = '0x76b714816689eC9f92F139900a04906ba0FBd34b';
 const RPC_URL = 'https://base.llamarpc.com';
 
 // V2 contract deployment block (approximate — used as lower bound for log queries)
@@ -56,21 +57,19 @@ export default function Leaderboard() {
           ? currentBlock - 150000n
           : DEPLOY_BLOCK;
 
-        // Fetch BetPlaced events
-        const betLogs = await client.getLogs({
-          address: CONTRACT_V2 as `0x${string}`,
-          event: BET_PLACED_EVENT,
-          fromBlock,
-          toBlock: currentBlock,
-        });
+        // Fetch BetPlaced events from V2 + V3
+        const [v2BetLogs, v3BetLogs] = await Promise.all([
+          client.getLogs({ address: CONTRACT_V2 as `0x${string}`, event: BET_PLACED_EVENT, fromBlock, toBlock: currentBlock }),
+          client.getLogs({ address: CONTRACT_V3 as `0x${string}`, event: BET_PLACED_EVENT, fromBlock, toBlock: currentBlock }).catch(() => []),
+        ]);
+        const betLogs = [...v2BetLogs, ...v3BetLogs];
 
-        // Fetch MarketResolved events for win-rate
-        const resolveLogs = await client.getLogs({
-          address: CONTRACT_V2 as `0x${string}`,
-          event: MARKET_RESOLVED_EVENT,
-          fromBlock,
-          toBlock: currentBlock,
-        });
+        // Fetch MarketResolved events from V2 + V3
+        const [v2ResolveLogs, v3ResolveLogs] = await Promise.all([
+          client.getLogs({ address: CONTRACT_V2 as `0x${string}`, event: MARKET_RESOLVED_EVENT, fromBlock, toBlock: currentBlock }),
+          client.getLogs({ address: CONTRACT_V3 as `0x${string}`, event: MARKET_RESOLVED_EVENT, fromBlock, toBlock: currentBlock }).catch(() => []),
+        ]);
+        const resolveLogs = [...v2ResolveLogs, ...v3ResolveLogs];
 
         // Build resolved market results map
         const marketResults: Record<string, boolean> = {};

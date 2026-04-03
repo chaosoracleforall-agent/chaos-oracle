@@ -29,6 +29,7 @@ const Leaderboard = dynamic(
 // --- CONFIGURATION ---
 const CONTRACT_V1 = '0x591A48064c1DB035B1562d60ed27cE18B48Bd228';
 const CONTRACT_V2 = '0x1b60e2C970Fe6e64c6e067130FF4Ae8a713E93b6';
+const CONTRACT_V3 = '0x76b714816689eC9f92F139900a04906ba0FBd34b';
 const RPC_URL = 'https://base.llamarpc.com';
 
 const ABI_V1 = [
@@ -82,6 +83,34 @@ const ABI_V2 = [
   }
 ] as const;
 
+const ABI_V3 = [
+  {
+    "name": "marketCount",
+    "type": "function",
+    "inputs": [],
+    "outputs": [{"name": "", "type": "uint256"}],
+    "stateMutability": "view"
+  },
+  {
+    "name": "markets",
+    "type": "function",
+    "inputs": [{"name": "", "type": "uint256"}],
+    "outputs": [
+      {"name": "question", "type": "string"},
+      {"name": "totalYes", "type": "uint256"},
+      {"name": "totalNo", "type": "uint256"},
+      {"name": "resolved", "type": "bool"},
+      {"name": "result", "type": "bool"},
+      {"name": "ethPool", "type": "uint256"},
+      {"name": "finalFee", "type": "uint256"},
+      {"name": "creator", "type": "address"},
+      {"name": "deadline", "type": "uint256"},
+      {"name": "featured", "type": "bool"}
+    ],
+    "stateMutability": "view"
+  }
+] as const;
+
 export default function LandingPage() {
   const [markets, setMarkets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -109,7 +138,32 @@ export default function LandingPage() {
       const fetchedMarkets: any[] = [];
 
       try {
-        // Fetch V2 markets first (newest)
+        // Fetch V3 markets first (newest)
+        try {
+          const v3Count = await client.readContract({
+            address: CONTRACT_V3,
+            abi: ABI_V3,
+            functionName: 'marketCount',
+          }) as bigint;
+
+          for (let i = Number(v3Count) - 1; i >= 0; i--) {
+            const data = await client.readContract({
+              address: CONTRACT_V3,
+              abi: ABI_V3,
+              functionName: 'markets',
+              args: [BigInt(i)],
+            }) as any;
+            fetchedMarkets.push({
+              id: i, version: 'V3', contract: CONTRACT_V3,
+              question: data[0], totalYes: data[1], totalNo: data[2],
+              ethPool: data[5], deadline: Number(data[8]), featured: data[9],
+            });
+          }
+        } catch (v3Err) {
+          console.warn('V3 fetch failed:', v3Err);
+        }
+
+        // Fetch V2 markets
         const v2Count = await client.readContract({
           address: CONTRACT_V2,
           abi: ABI_V2,
@@ -257,7 +311,7 @@ export default function LandingPage() {
           <a href="https://warpcast.com/chaosmachine" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>WARPCAST</a>
           <a href="https://discord.gg/9GAFZvXC" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>DISCORD</a>
           <a href="https://github.com/chaosoracleforall-agent/chaos-oracle" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>GITHUB</a>
-          <a href="https://basescan.org/address/0x1b60e2C970Fe6e64c6e067130FF4Ae8a713E93b6" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>BASESCAN</a>
+          <a href="https://basescan.org/address/0x76b714816689eC9f92F139900a04906ba0FBd34b" target="_blank" rel="noopener noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>BASESCAN</a>
           <a href="/CHAOS_WHITEPAPER.txt" target="_blank" rel="noreferrer" style={{ color: '#555', textDecoration: 'underline' }}>WHITEPAPER</a>
         </div>
         <p>PROTOCOL_VERSION: 3.0.0</p>

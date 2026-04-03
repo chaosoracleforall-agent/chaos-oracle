@@ -1,5 +1,18 @@
 # Changelog
 
+## [4.2.0] - 2026-04-03
+
+### Added
+- **PredictionMarketFactoryV3 deployed to Base mainnet** — `0x76b714816689eC9f92F139900a04906ba0FBd34b`. Features: upgradeable agent wallet, market deadlines, 24h resolution dispute window, circuit breaker, CHAOS-gated market creation, tiered fees, bet reclamation.
+- **Frontend V3 support** — Markets from V3 contract displayed alongside V1/V2. Deadline selector in market creation form (1/3/7/14/30 days).
+- **Farcaster Frames updated** — Frame API now reads from V3 contract.
+- **Leaderboard aggregates V2+V3** — BetPlaced and MarketResolved events fetched from both contracts.
+
+### Changed
+- Market creation now targets V3 contract with required deadline parameter.
+- BaseScan link in footer updated to V3 contract address.
+- Agent `.env` updated to V3 contract address on VM.
+
 ## [4.1.1] - 2026-04-03
 
 ### Added

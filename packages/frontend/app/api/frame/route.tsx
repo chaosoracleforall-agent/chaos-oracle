@@ -4,7 +4,7 @@ import { parseEther, createPublicClient, http, formatEther } from 'viem';
 import { base } from 'viem/chains';
 
 // --- CONFIGURATION ---
-const PREDICTION_CONTRACT = '0x1b60e2C970Fe6e64c6e067130FF4Ae8a713E93b6' as `0x${string}`;
+const PREDICTION_CONTRACT = '0x76b714816689eC9f92F139900a04906ba0FBd34b' as `0x${string}`;
 const RPC_URL = process.env.RPC_URL || 'https://mainnet.base.org';
 const SITE_URL = 'https://chaos-oracle-147d0.web.app';
 
