@@ -41,6 +41,10 @@ id_chaos_oracle
 vault.enc
 secrets.json
 *.enc
+.env_temp
+*.env_temp
+.env_vault*
+*.env_vault*
 
 # Agent state files
 packages/agent/*_state.json
