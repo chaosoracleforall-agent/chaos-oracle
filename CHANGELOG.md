@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.1.1] - 2026-04-03
+
+### Added
+- **Twitter mention scanning re-enabled** — Account upgraded to Basic tier; `scanMentionsAndReply()` now runs every 15-20 min with numeric SELF_USER_ID validation and 403 diagnostic logging.
+- **Farcaster channel posting** — 30% of viralization casts posted to relevant channels (/base, /defi, /crypto, /prediction-markets) based on content keywords.
+- **A/B format tracking** — Posts now track format (single/thread/quote_cast); engagement data feeds into format performance metrics for comparing thread vs single tweet effectiveness.
+
+### Fixed
+- **Reddit agent crashes** — `loadState()` now validates all array/object fields with migration guards. Fixes `Cannot read properties of undefined (reading 'filter')` on `verifyRecentPosts()` and `getStats()`.
+- **Moltbook agent crashes** — `loadState()` now validates `subscribedSubmolts`, `followedAgents`, `postHistory`, `commentHistory` arrays. Fixes `Cannot read properties of undefined (reading 'includes')`.
+
 ## [4.1.0] - 2026-04-03
 
 ### Added
