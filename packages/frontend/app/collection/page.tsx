@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { createPublicClient, http, parseAbi } from 'viem';
+import { createPublicClient, http, fallback, parseAbi } from 'viem';
 import { base } from 'viem/chains';
 
 const WalletConnect = dynamic(
@@ -11,7 +11,11 @@ const WalletConnect = dynamic(
 );
 
 const CHAOS_CARDS = '0x4Fc3B3Be82Bd492BC071229B5732f23b4b314ee5' as `0x${string}`;
-const RPC_URL = 'https://base.llamarpc.com';
+const RPC_URLS = [
+  'https://mainnet.base.org',
+  'https://base-rpc.publicnode.com',
+  'https://base.llamarpc.com',
+];
 
 const CHAOS_CARDS_ABI = parseAbi([
   'function totalMinted() view returns (uint256)',
@@ -44,7 +48,7 @@ export default function CollectionPage() {
 
   useEffect(() => {
     async function fetchStats() {
-      const client = createPublicClient({ chain: base, transport: http(RPC_URL) });
+      const client = createPublicClient({ chain: base, transport: fallback(RPC_URLS.map(url => http(url)), { retryCount: 2 }) });
 
       try {
         const minted = await client.readContract({

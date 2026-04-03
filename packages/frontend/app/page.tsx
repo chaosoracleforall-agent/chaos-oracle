@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { createPublicClient, http, formatEther } from 'viem';
+import { createPublicClient, http, fallback, formatEther } from 'viem';
 import { base } from 'viem/chains';
 
 // DYNAMIC LOADING: Isolating components from server-side crash
@@ -30,7 +30,11 @@ const Leaderboard = dynamic(
 const CONTRACT_V1 = '0x591A48064c1DB035B1562d60ed27cE18B48Bd228';
 const CONTRACT_V2 = '0x1b60e2C970Fe6e64c6e067130FF4Ae8a713E93b6';
 const CONTRACT_V3 = '0x76b714816689eC9f92F139900a04906ba0FBd34b';
-const RPC_URL = 'https://base.llamarpc.com';
+const RPC_URLS = [
+  'https://mainnet.base.org',
+  'https://base-rpc.publicnode.com',
+  'https://base.llamarpc.com',
+];
 
 const ABI_V1 = [
   {
@@ -134,7 +138,7 @@ export default function LandingPage() {
 
   useEffect(() => {
     async function fetchMarkets() {
-      const client = createPublicClient({ chain: base, transport: http(RPC_URL) });
+      const client = createPublicClient({ chain: base, transport: fallback(RPC_URLS.map(url => http(url)), { retryCount: 2 }) });
       const fetchedMarkets: any[] = [];
 
       try {

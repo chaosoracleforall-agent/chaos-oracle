@@ -1,12 +1,16 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { createPublicClient, http, formatEther, parseAbiItem } from 'viem';
+import { createPublicClient, http, fallback, formatEther, parseAbiItem } from 'viem';
 import { base } from 'viem/chains';
 
 const CONTRACT_V2 = '0x1b60e2C970Fe6e64c6e067130FF4Ae8a713E93b6';
 const CONTRACT_V3 = '0x76b714816689eC9f92F139900a04906ba0FBd34b';
-const RPC_URL = 'https://base.llamarpc.com';
+const RPC_URLS = [
+  'https://mainnet.base.org',
+  'https://base-rpc.publicnode.com',
+  'https://base.llamarpc.com',
+];
 
 // V2 contract deployment block (approximate — used as lower bound for log queries)
 const DEPLOY_BLOCK = 18000000n;
@@ -48,7 +52,7 @@ export default function Leaderboard() {
       try {
         const client = createPublicClient({
           chain: base,
-          transport: http(RPC_URL),
+          transport: fallback(RPC_URLS.map(url => http(url)), { retryCount: 2 }),
         });
 
         const currentBlock = await client.getBlockNumber();
