@@ -1,5 +1,15 @@
 # Changelog
 
+## [4.2.2] - 2026-04-03
+
+### Fixed
+- **RPC rate limiting** — Replaced single `llamarpc.com` RPC with viem `fallback` transport across all frontend pages: `mainnet.base.org` → `publicnode.com` → `llamarpc.com`. Eliminates rate-limit failures that caused markets, leaderboard, and collection to fail loading.
+- **Firebase routing for /claim, /bridge, /collection** — Added `cleanUrls: true` and removed SPA catch-all rewrite from `firebase.json`. Each route now serves its own static HTML file instead of falling through to `index.html`.
+
+### Changed
+- `firebase.json` — Removed `rewrites` array, added `cleanUrls: true` and `trailingSlash: false`.
+- All frontend `createPublicClient` calls now use `fallback()` transport with 3 RPCs and `retryCount: 2`.
+
 ## [4.2.1] - 2026-04-03
 
 ### Fixed
@@ -11,6 +21,10 @@
 
 ### Security
 - Final security audit passed: git history clean, no hardcoded secrets, all credentials rotated, `.gitignore` comprehensive.
+- Git history scrubbed via BFG — `.env_temp` and `.env_vault_decrypted.json` removed from all commits.
+- All API keys rotated: Twitter (Consumer + Access + Bearer + OAuth 2.0), Neynar (API Key + Client ID), GitHub PAT.
+- `.gitignore` updated to block `.env_temp`, `*.env_temp`, `.env_vault*`, `*.env_vault*`.
+- Compromised creator wallet `0x6a2A...4103` documented — sweeper contract drains all incoming ETH.
 
 ## [4.2.0] - 2026-04-03
 

@@ -39,12 +39,15 @@ chaos-oracle/
 ### Frontend (`packages/frontend`)
 ```bash
 npm run dev                                          # local dev server
-npx next build && npx firebase deploy                # build + deploy to Firebase Hosting
+npx next build && npx firebase deploy --only hosting # build + deploy to Firebase Hosting
 ```
+> **RPC**: Frontend uses viem `fallback` transport: `mainnet.base.org` → `publicnode.com` → `llamarpc.com`.
+> **Firebase**: `cleanUrls: true`, no SPA rewrite. Each page is a separate static HTML file.
 
 ### Contracts (`packages/contracts`)
 ```bash
 cd packages/contracts && npx hardhat test            # run Solidity tests
+PRIVATE_KEY=<key> npx hardhat run scripts/deploy_v3.js --network base  # deploy V3 to mainnet
 ```
 
 ### Agent (`packages/agent`)
@@ -52,6 +55,7 @@ cd packages/contracts && npx hardhat test            # run Solidity tests
 cd packages/agent && npx ts-node index.ts            # run locally
 pm2 start ecosystem.config.js                        # run via PM2
 ```
+> **VM deployment**: Agent files live at `~/agent-node/` on the VM (flat directory, not monorepo). Deploy via `scp` + `pm2 restart chaos-agent --update-env`.
 
 ### Agent VM
 ```bash
@@ -81,7 +85,7 @@ gcloud compute ssh chaos-sovereign-host --zone=us-central1-a
 | `/bridge` | Bridge | Links to Base Bridge, Relay, Orbiter Finance |
 | `/api/frame` | Farcaster Frame | Interactive prediction market frames via Frog |
 
-## Agent Features (v4.1.x)
+## Agent Features (v4.2.x)
 - **Multi-platform posting**: Twitter/X, Farcaster, Discord, Reddit, Moltbook
 - **Tweet dedup**: Recent post history injected into LLM prompts
 - **Twitter threads**: 20% chance of 3-tweet threads vs single tweets
@@ -96,6 +100,22 @@ gcloud compute ssh chaos-sovereign-host --zone=us-central1-a
 - **Growth Intelligence**: AI-driven posting boost, community events, team alerts
 - **Twitter mention scanning**: Replies to @ChaosOracle4all mentions (Basic tier)
 - **Farcaster channel posting**: Posts to /base, /defi, /crypto, /prediction-markets
+
+## Agent Orchestration Loops
+
+| Loop | Interval | Function |
+|------|----------|----------|
+| Social Engagement | 15-20 min | Farcaster + Twitter mention scanning & replies |
+| Social Viralization | 4-5h (2-3h boosted) | Post to Twitter + Farcaster (+ channel targeting) |
+| Strategic Growth | 6-7h | GrowthIntelligence analysis + actions |
+| Social Learning | 6h | Engagement analysis + weight rebalancing |
+| Farcaster Quote Casts | 6h | Like trending casts + post quote casts |
+| Discord Engagement | 3h | Community content posts |
+| Reddit Promotion | 4h | Subreddit strategy + comment engagement |
+| Growth Engine | 20 min | Blockchain sync, rewards, streak shoutouts |
+| Engagement Collection | 2h | Collect metrics from all platforms |
+| NFT Health Check | 30 min | Campaign status monitoring |
+| Daily Tarot | Noon UTC | Generate + post daily tarot NFT |
 
 ## Security Notes
 - Agent credentials stored in GCP Secret Manager + `.env` on VM
