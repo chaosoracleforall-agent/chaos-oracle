@@ -250,8 +250,8 @@ async function renderMarketFrame(c: any, marketId: number) {
         ] as any
       : [
           <TextInput placeholder="Amount in ETH (default 0.01)" />,
-          <Button.Transaction target={`/tx/bet?id=${marketId}&yes=true`}>BET YES ({yesPct}%)</Button.Transaction>,
-          <Button.Transaction target={`/tx/bet?id=${marketId}&yes=false`}>BET NO ({noPct}%)</Button.Transaction>,
+          <Button.Transaction target={`/tx/bet?id=${marketId}&yes=true`}>{`BET YES (${yesPct}%)`}</Button.Transaction>,
+          <Button.Transaction target={`/tx/bet?id=${marketId}&yes=false`}>{`BET NO (${noPct}%)`}</Button.Transaction>,
           <Button.Link href={`${SITE_URL}?market=${marketId}`}>OPEN APP</Button.Link>,
         ] as any,
   });

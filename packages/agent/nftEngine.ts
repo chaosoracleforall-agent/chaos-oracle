@@ -62,14 +62,7 @@ interface CampaignState {
   errors: Array<{ message: string; timestamp: number }>;
 }
 
-function loadState(): CampaignState {
-  try {
-    if (fs.existsSync(STATE_FILE)) {
-      return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
-    }
-  } catch (err) {
-    console.warn('[NFT_ENGINE] Failed to load campaign state:', err instanceof Error ? err.message : err);
-  }
+function createDefaultState(): CampaignState {
   return {
     totalMinted: 0,
     dailyMints: {},
@@ -81,7 +74,34 @@ function loadState(): CampaignState {
   };
 }
 
+function loadState(): CampaignState {
+  try {
+    if (fs.existsSync(STATE_FILE)) {
+      const parsed = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+      const defaults = createDefaultState();
+      return {
+        ...defaults,
+        ...parsed,
+        // Ensure arrays are never undefined even if state file was reset to {}
+        mintLog: parsed.mintLog || [],
+        errors: parsed.errors || [],
+        // Ensure objects are never undefined
+        dailyMints: parsed.dailyMints || {},
+        userCooldowns: parsed.userCooldowns || {},
+        mythicWeekly: parsed.mythicWeekly || {},
+        pendingClaims: parsed.pendingClaims || {},
+      };
+    }
+  } catch (err) {
+    console.warn('[NFT_ENGINE] Failed to load campaign state:', err instanceof Error ? err.message : err);
+  }
+  return createDefaultState();
+}
+
 function saveState(state: CampaignState) {
+  // Ensure arrays exist before bounding
+  state.mintLog = state.mintLog || [];
+  state.errors = state.errors || [];
   // Keep mint log bounded (last 500 entries)
   if (state.mintLog.length > 500) {
     state.mintLog = state.mintLog.slice(-500);
@@ -862,7 +882,7 @@ class NFTEngine {
 
       const today = new Date().toDateString();
       const dailyCount = this.state.dailyMints[today] || 0;
-      const recentErrors = this.state.errors.filter(e => Date.now() - e.timestamp < 86400000).length;
+      const recentErrors = (this.state.errors || []).filter(e => Date.now() - e.timestamp < 86400000).length;
 
       return [
         `[NFT_CAMPAIGN] Status: ${active ? 'ACTIVE' : 'PAUSED'}`,
@@ -907,7 +927,7 @@ class NFTEngine {
       }
     }
 
-    const recentErrors = this.state.errors.filter(e => Date.now() - e.timestamp < 3600000);
+    const recentErrors = (this.state.errors || []).filter(e => Date.now() - e.timestamp < 3600000);
     if (recentErrors.length > 5) issues.push(`${recentErrors.length} errors in last hour`);
 
     return { healthy: issues.length === 0, issues };

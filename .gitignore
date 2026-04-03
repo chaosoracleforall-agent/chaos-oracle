@@ -17,6 +17,9 @@ out/
 # Firebase
 .firebase/
 
+# Firebase
+.firebase/
+
 # Hardhat/Foundry
 artifacts/
 cache/

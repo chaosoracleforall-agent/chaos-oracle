@@ -266,6 +266,12 @@ function loadState(): GrowthState {
 }
 
 function saveState(state: GrowthState): void {
+  // Ensure arrays/objects exist before bounding (guards against reset state files)
+  state.campaigns = state.campaigns || { history: [] };
+  state.campaigns.history = state.campaigns.history || [];
+  state.notifications = state.notifications || [];
+  state.processedLogIds = state.processedLogIds || [];
+  state.replayQueue = state.replayQueue || [];
   if (state.campaigns.history.length > 20) {
     state.campaigns.history = state.campaigns.history.slice(-20);
   }

@@ -69,12 +69,17 @@ class NFTReportAgent {
       onChainStats = '  NFT Engine not ready (missing env vars)';
     }
 
-    // Mint log analysis
+    // Mint log analysis (defensive defaults in case state was reset to {})
     const last4h = Date.now() - 4 * 3600000;
     const last24h = Date.now() - 24 * 3600000;
 
-    const mintsLast4h = state.mintLog.filter(m => m.timestamp > last4h);
-    const mintsLast24h = state.mintLog.filter(m => m.timestamp > last24h);
+    const mintLog = state.mintLog || [];
+    const errors = state.errors || [];
+    const pendingClaimsMap = state.pendingClaims || {};
+    const dailyMintsMap = state.dailyMints || {};
+
+    const mintsLast4h = mintLog.filter(m => m.timestamp > last4h);
+    const mintsLast24h = mintLog.filter(m => m.timestamp > last24h);
 
     // Tier breakdown (last 24h)
     const tierCount24h: Record<string, number> = {};
@@ -86,19 +91,19 @@ class NFTReportAgent {
     const uniqueRecipients24h = new Set(mintsLast24h.map(m => m.recipient)).size;
 
     // Errors
-    const errorsLast4h = state.errors.filter(e => e.timestamp > last4h);
-    const errorsLast24h = state.errors.filter(e => e.timestamp > last24h);
+    const errorsLast4h = errors.filter(e => e.timestamp > last4h);
+    const errorsLast24h = errors.filter(e => e.timestamp > last24h);
 
     // Pending claims
-    const pendingClaims = Object.entries(state.pendingClaims);
+    const pendingClaims = Object.entries(pendingClaimsMap);
     const expiredClaims = pendingClaims.filter(([_, c]) => Date.now() - c.createdAt > 24 * 3600000);
 
     // Today's daily mint count
     const today = now.toDateString();
-    const dailyCount = state.dailyMints[today] || 0;
+    const dailyCount = dailyMintsMap[today] || 0;
 
     // Recent mint details (last 5)
-    const recentMints = state.mintLog.slice(-5).reverse();
+    const recentMints = mintLog.slice(-5).reverse();
 
     // Build report
     const sections = [
@@ -115,7 +120,7 @@ class NFTReportAgent {
       onChainStats,
       ``,
       `───────── MINTING ACTIVITY ─────────`,
-      `  Total minted (all time): ${state.totalMinted}`,
+      `  Total minted (all time): ${state.totalMinted || 0}`,
       `  Minted today: ${dailyCount}`,
       `  Minted (last 4h): ${mintsLast4h.length}`,
       `  Minted (last 24h): ${mintsLast24h.length}`,

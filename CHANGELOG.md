@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.0.1] - 2026-04-02
+
+### Changed
+- **V3 deploy script updated for testnet** — `scripts/deploy_v3.js` now auto-detects network; on Base Sepolia (or local Hardhat) it deploys a MockERC20 as tCHAOS, uses zero-address Aerodrome router (buy-and-burn disabled), and sets deployer as both creator and agent. Mainnet config preserved for `--network base`. Verified end-to-end on Hardhat local network.
+
+### Note
+- Base Sepolia deployment pending: wallet `0x6a2A797CB5736252E44B81965aa7fcF7f43F4103` needs testnet ETH. Faucets require browser-based CAPTCHA or mainnet balance. Once funded, deploy with:
+  ```bash
+  cd packages/contracts
+  PRIVATE_KEY=<key> npx hardhat run scripts/deploy_v3.js --network baseSepolia
+  ```
+
 ## [4.0.0] - 2026-04-02
 
 ### Added
