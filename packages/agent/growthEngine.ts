@@ -166,6 +166,7 @@ interface GrowthCycleResult {
   notifications: GrowthNotification[];
   campaignAnnouncement?: string;
   leaderboardAnnouncement?: string;
+  streakShoutouts: string[];
 }
 
 interface RewardSnapshot {
@@ -355,6 +356,7 @@ function currentCampaignDescription(type: CampaignType): string {
 
 class GrowthEngine {
   private state: GrowthState = loadState();
+  private pendingShoutouts: string[] = [];
   private providerUrls = Array.from(new Set([
     (process.env.BASE_RPC_URL || '').trim(),
     ...(process.env.BASE_RPC_FALLBACKS || '').split(',').map((url) => url.trim()).filter(Boolean),
@@ -677,6 +679,15 @@ class GrowthEngine {
         StreakTier: streakLabel,
       }
     );
+
+    // Social shoutout for notable streaks (5+)
+    if (streak >= 5) {
+      const user = this.state.users[userId];
+      const handle = user?.handle || wallet.slice(0, 8) + '...';
+      this.pendingShoutouts.push(
+        `${handle} just hit a ${streak}-win streak on Chaos Oracle! ${streakLabel} tier unlocked.`
+      );
+    }
 
     // Notify user about streak bonus activation at tier boundaries
     if ([3, 7, 30].includes(streak)) {
@@ -1588,6 +1599,8 @@ class GrowthEngine {
     }
 
     const notifications = [...this.state.notifications];
+    // Drain pending shoutouts (max 3 per cycle)
+    const streakShoutouts = this.pendingShoutouts.splice(0, 3);
     saveState(this.state);
 
     return {
@@ -1597,6 +1610,7 @@ class GrowthEngine {
       notifications,
       campaignAnnouncement: campaignInfo.announcement,
       leaderboardAnnouncement,
+      streakShoutouts,
     };
   }
 

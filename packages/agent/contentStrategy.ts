@@ -50,6 +50,7 @@ const DEFAULT_MIX: ContentMix[] = [
 interface ContentState {
   recentTypes: { type: ContentType; platform: string; timestamp: number }[];
   typePerformance: Record<ContentType, { total: number; avgEngagement: number }>;
+  adjustedWeights?: Record<ContentType, number>; // dynamically rebalanced weights
 }
 
 const STATE_FILE = path.join(__dirname, 'content_strategy_state.json');
@@ -98,7 +99,7 @@ class ContentStrategy {
     const pool: { type: ContentType; adjustedWeight: number; snippet: string; injectSiteUrl: boolean }[] = [];
 
     for (const mix of DEFAULT_MIX) {
-      let weight = mix.weight;
+      let weight = this.state.adjustedWeights?.[mix.type] ?? mix.weight;
 
       // Penalize if used in last 3 posts on this platform
       const recentCount = recentOnPlatform.filter(t => t === mix.type).length;
@@ -157,6 +158,48 @@ class ContentStrategy {
     perf.avgEngagement = (perf.avgEngagement * perf.total + engagement) / (perf.total + 1);
     perf.total++;
     this.saveState();
+  }
+
+  /**
+   * Dynamically rebalance weights based on engagement performance.
+   * Called from SocialLearner.analyzeAndLearn() every 6 hours.
+   */
+  rebalanceWeights(): void {
+    const types = Object.keys(this.state.typePerformance) as ContentType[];
+    const eligible = types.filter(t => this.state.typePerformance[t]?.total >= 5);
+    if (eligible.length < 2) return; // need at least 2 types with data
+
+    const globalAvg = eligible.reduce((s, t) => s + this.state.typePerformance[t].avgEngagement, 0) / eligible.length;
+    if (globalAvg <= 0) return;
+
+    const adjusted: Record<string, number> = {};
+    for (const mix of DEFAULT_MIX) {
+      const perf = this.state.typePerformance[mix.type];
+      if (!perf || perf.total < 5) {
+        adjusted[mix.type] = mix.weight;
+        continue;
+      }
+      const ratio = perf.avgEngagement / globalAvg;
+      if (ratio >= 1.5) {
+        // 50%+ above average: boost by 20%
+        adjusted[mix.type] = Math.min(40, mix.weight * 1.2);
+      } else if (ratio <= 0.5) {
+        // 50%+ below average: reduce by 20%
+        adjusted[mix.type] = Math.max(5, mix.weight * 0.8);
+      } else {
+        adjusted[mix.type] = mix.weight;
+      }
+    }
+    this.state.adjustedWeights = adjusted as Record<ContentType, number>;
+    this.saveState();
+    console.log(`[CONTENT_STRATEGY] Weights rebalanced: ${JSON.stringify(adjusted)}`);
+  }
+
+  /**
+   * Get the adjusted mix for reporting.
+   */
+  getAdjustedMix(): Record<string, number> {
+    return this.state.adjustedWeights || Object.fromEntries(DEFAULT_MIX.map(m => [m.type, m.weight]));
   }
 
   /**

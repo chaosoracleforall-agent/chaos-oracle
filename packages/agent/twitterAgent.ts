@@ -2,7 +2,9 @@ import { TwitterApi } from 'twitter-api-v2';
 import ChaosBrain from './conversationalAgent';
 import NFTEngine from './nftEngine';
 import SocialLearner from './socialLearner';
+import ContentStrategy from './contentStrategy';
 import EngagementCollector from './engagementCollector';
+import { generateContent } from './modelRouter';
 import { updateTwitterDiagnostics } from './socialDiagnostics';
 import { CANONICAL_URLS, repairAllUrls, detectBrokenUrls, sanitizePostText, injectUrlsPostGeneration, validatePostBeforePublish } from './urlUtils';
 import * as dotenv from 'dotenv';
@@ -348,13 +350,23 @@ class TwitterAgent {
       return;
     }
 
+    // 20% chance to post a thread instead of a single tweet
+    if (Math.random() < 0.2) {
+      console.log('[X_AGENT] Rolling thread mode...');
+      return this.postChaosThread();
+    }
+
     try {
       const client = getTwitterClient();
       const includeDiscord = Math.random() < 0.3;
+      const recentTweets = SocialLearner.getRecentPosts('twitter', 15);
+      const recentBlock = recentTweets.length > 0
+        ? `\n\nYour recent tweets (DO NOT repeat or closely paraphrase any of these):\n${recentTweets.map((t, i) => `${i + 1}. ${t}`).join('\n')}`
+        : '';
       const prompt = `Generate a unique post for X/Twitter as the Chaos Oracle, an autonomous AI prediction market on Base.
         Keep it under 220 characters. Be witty, insightful, and on-brand (terminal/oracle aesthetic).
         Mix up the style — sometimes market commentary, sometimes philosophical, sometimes a bold prediction.
-        Never be spammy, repetitive, or use excessive hashtags. Max 2 hashtags.`;
+        Never be spammy, repetitive, or use excessive hashtags. Max 2 hashtags.${recentBlock}`;
       const post = await ChaosBrain.generateResponse("SYSTEM_INTERNAL", prompt);
       const withUrls = injectUrlsPostGeneration(post, { siteUrl: true, discordUrl: includeDiscord, maxLen: 280 });
       const tweetText = sanitizePostText(withUrls, 280);
@@ -376,6 +388,87 @@ class TwitterAgent {
       return result;
     } catch (error: any) {
       console.error("[X_AGENT] Post failed:", error.code || error.message);
+    }
+  }
+  /**
+   * Post a thread (array of tweets chained as replies).
+   */
+  async postThread(tweets: string[]): Promise<string | undefined> {
+    if (!this.canTweetToday() || tweets.length === 0) return;
+    const client = getTwitterClient();
+    let lastTweetId: string | undefined;
+
+    for (let i = 0; i < Math.min(tweets.length, 4); i++) {
+      const tweetText = sanitizePostText(tweets[i], 280);
+      const validation = this.validateTweetPayload(tweetText);
+      if (!validation.ok) {
+        console.error(`[X_AGENT] Thread tweet ${i + 1} blocked: ${validation.warnings.join(' | ')}`);
+        break;
+      }
+      try {
+        let result;
+        if (i === 0) {
+          result = await client.v2.tweet(tweetText);
+        } else {
+          result = await client.v2.reply(tweetText, lastTweetId!);
+        }
+        lastTweetId = result?.data?.id;
+        this.recordTweet();
+        if (i === 0) {
+          SocialLearner.registerPost('twitter', tweetText, lastTweetId);
+          EngagementCollector.trackPost('twitter', tweetText, lastTweetId);
+        }
+        this.logTweetDiagnostics(`thread tweet ${i + 1}/${tweets.length}`, tweetText);
+      } catch (err: any) {
+        console.error(`[X_AGENT] Thread tweet ${i + 1} failed:`, err.code || err.message);
+        break;
+      }
+    }
+    console.log(`[X_AGENT] Thread posted (${tweets.length} tweets). ${this.getDailyStats()}`);
+    return lastTweetId;
+  }
+
+  /**
+   * Generate and post a 3-tweet thread. 20% chance from postChaosManifesto.
+   */
+  async postChaosThread() {
+    if (!this.canTweetToday()) return;
+
+    const { type: contentType, systemPromptSnippet } = ContentStrategy.selectNextType('twitter');
+    const recentTweets = SocialLearner.getRecentPosts('twitter', 10);
+    const recentBlock = recentTweets.length > 0
+      ? `\nRecent tweets (avoid repeating):\n${recentTweets.slice(-5).map((t, i) => `${i + 1}. ${t}`).join('\n')}`
+      : '';
+
+    const prompt = `Generate a 3-tweet thread for X/Twitter as the Chaos Oracle.
+Content type: ${contentType}
+Direction: ${systemPromptSnippet}
+
+Format your response as exactly 3 tweets separated by ---
+Tweet 1: Hook — grab attention (under 240 chars)
+Tweet 2: Insight or analysis (under 260 chars)
+Tweet 3: CTA with the site URL https://chaos-oracle-147d0.web.app/ (under 260 chars)
+
+Rules:
+- Each tweet must stand alone but flow as a narrative
+- NEVER modify the URL
+- Max 2 hashtags total across all tweets${recentBlock}`;
+
+    try {
+      const raw = await generateContent('VIRAL_CONTENT',
+        'You are the Chaos Oracle ($CHAOS) — autonomous AI prediction market on Base. Sardonic wit, sharp takes.',
+        prompt
+      );
+      const tweets = raw.split(/---+/).map(t => t.trim()).filter(t => t.length > 0 && t.length <= 280);
+      if (tweets.length >= 2) {
+        await this.postThread(tweets);
+      } else {
+        // Fallback: post as single tweet
+        const single = sanitizePostText(tweets[0] || raw.slice(0, 260), 280);
+        await this.postCustomTweet(single);
+      }
+    } catch (err: any) {
+      console.error('[X_AGENT] Thread generation failed:', err.message);
     }
   }
 }

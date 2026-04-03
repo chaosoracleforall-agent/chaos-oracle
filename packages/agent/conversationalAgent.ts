@@ -37,6 +37,7 @@ class ChaosBrain {
   private memory: Record<string, string[]> = {};
   private processedFarcasterHashes = new Set<string>();
   private lastFarcasterCursor: string | null = null;
+  private recentReplies: string[] = []; // Ring buffer for reply dedup
 
   isAuthorizedController(userId: string): boolean {
     return AUTHORIZED_CONTROLLERS.has(userId);
@@ -106,8 +107,22 @@ Rules:
 - Chaos Cards NFTs: prophecies, rekt certificates, tarot drops — mention when natural`;
 
     try {
-      const agentReply = await generateContent(taskType, systemPrompt, sanitizedMessage);
+      // Inject recent replies for dedup (only for actual user replies, not internal prompts)
+      let promptWithDedup = sanitizedMessage;
+      if (!INTERNAL_ONLY_CALLERS.has(userId) && this.recentReplies.length > 0) {
+        const recentSnippets = this.recentReplies.slice(-10).map((r, i) => `${i + 1}. ${r.slice(0, 120)}`).join('\n');
+        promptWithDedup += `\n\n[Your recent replies — avoid repeating similar themes/phrasing:\n${recentSnippets}]`;
+      }
+
+      const agentReply = await generateContent(taskType, systemPrompt, promptWithDedup);
       this.memory[userId].push(`Chaos Oracle: ${agentReply}`);
+
+      // Track reply for dedup (only non-internal)
+      if (!INTERNAL_ONLY_CALLERS.has(userId)) {
+        this.recentReplies.push(agentReply);
+        if (this.recentReplies.length > 30) this.recentReplies.shift();
+      }
+
       return agentReply;
     } catch (error: any) {
       console.error("[MODEL_ROUTER_ERROR]: Content generation failed.", error.message);
@@ -181,6 +196,8 @@ Rules:
 
         const replyText = await this.generateResponse(cast.author.fid.toString(), cast.text);
         console.log(`[FARCASTER] Replying to ${cast.author.username}: ${replyText.slice(0, 100)}...`);
+        // Like the mention as a proactive engagement signal
+        await this.likeCast(cast.hash);
         const replyHash = await this.postFarcasterCast(replyText, cast.hash);
         if (replyHash) {
           EngagementCollector.trackPost('farcaster', replyText, replyHash);
@@ -222,6 +239,58 @@ Rules:
       return castHash;
     } catch (e: any) {
       console.error("[FARCASTER] Post failed:", e.response?.status, e.response?.data?.message || e.message);
+      return null;
+    }
+  }
+  /**
+   * Like a Farcaster cast via Neynar reaction API.
+   */
+  async likeCast(castHash: string): Promise<boolean> {
+    const SIGNER_UUID = process.env.NEYNAR_SIGNER_UUID;
+    if (!SIGNER_UUID || !NEYNAR_API_KEY) return false;
+    try {
+      await axios.post('https://api.neynar.com/v2/farcaster/reaction', {
+        signer_uuid: SIGNER_UUID,
+        reaction_type: 'like',
+        target: castHash,
+      }, {
+        headers: { 'x-api-key': NEYNAR_API_KEY }
+      });
+      console.log(`[FARCASTER] Liked cast ${castHash.slice(0, 10)}...`);
+      return true;
+    } catch (e: any) {
+      // 409 = already liked, not an error
+      if (e.response?.status === 409) return true;
+      console.error(`[FARCASTER] Like failed:`, e.response?.status, e.response?.data?.message || e.message);
+      return false;
+    }
+  }
+
+  /**
+   * Post a quote cast on Farcaster (embed another cast with commentary).
+   */
+  async quoteCast(targetCastHash: string, targetFid: number, commentary: string): Promise<string | null> {
+    const SIGNER_UUID = process.env.NEYNAR_SIGNER_UUID;
+    if (!SIGNER_UUID) return null;
+    try {
+      let castText = repairAllUrls(commentary).slice(0, 1024);
+      if (!validatePostBeforePublish(castText, 'Farcaster')) {
+        console.error('[FARCASTER] Quote cast blocked due to broken URLs.');
+        return null;
+      }
+      const body = {
+        signer_uuid: SIGNER_UUID,
+        text: castText,
+        embeds: [{ cast_id: { fid: targetFid, hash: targetCastHash } }],
+      };
+      const response = await axios.post('https://api.neynar.com/v2/farcaster/cast', body, {
+        headers: { 'x-api-key': NEYNAR_API_KEY }
+      });
+      const hash = response.data?.cast?.hash || null;
+      console.log(`[FARCASTER] Quote cast posted: ${castText.slice(0, 80)}...`);
+      return hash;
+    } catch (e: any) {
+      console.error('[FARCASTER] Quote cast failed:', e.response?.status, e.response?.data?.message || e.message);
       return null;
     }
   }

@@ -10,6 +10,24 @@ dotenv.config();
  * Collects real metrics, diagnoses bottlenecks, and takes data-driven actions.
  */
 class GrowthIntelligence {
+  private postingBoostUntil: number = 0; // timestamp when boost expires
+  private lastCommunityEvent: string | null = null;
+  private lastAlert: string | null = null;
+
+  /**
+   * Check if posting frequency boost is active.
+   */
+  getPostingBoost(): boolean {
+    return Date.now() < this.postingBoostUntil;
+  }
+
+  /**
+   * Activate posting boost for a given number of hours.
+   */
+  setPostingBoost(hours: number = 12): void {
+    this.postingBoostUntil = Date.now() + hours * 3600000;
+    console.log(`[GROWTH_INTEL] Posting boost activated for ${hours}h`);
+  }
 
   /**
    * Collect all available metrics and store them.
@@ -122,15 +140,46 @@ NO_ACTION: [reasoning if metrics look healthy]`;
         console.error('[GROWTH_INTEL] Market deployment failed:', err.message);
       }
     } else if (decision.includes('INCREASE_POSTING')) {
-      // The viralization loop will handle this — just log the recommendation
-      console.log('[GROWTH_INTEL] Recommendation: Increase posting frequency');
+      this.setPostingBoost(12);
+      console.log('[GROWTH_INTEL] Action: Posting boost activated for 12h');
     } else if (decision.includes('COMMUNITY_EVENT')) {
-      console.log('[GROWTH_INTEL] Recommendation: Run community event');
+      try {
+        const eventDetails = decision.split('COMMUNITY_EVENT:')[1]?.trim() || 'Community engagement event';
+        const eventPost = await generateContent('VIRAL_CONTENT',
+          'You are the Chaos Oracle. Generate a fun community engagement post for Discord — a poll, debate prompt, or prediction challenge. Be conversational and encourage replies.',
+          `Create a community event post based on this idea: ${eventDetails}. Keep it under 500 chars. Include a question or call to action.`
+        );
+        // Store for index.ts to broadcast
+        this.lastCommunityEvent = eventPost;
+        console.log(`[GROWTH_INTEL] Action: Community event generated: ${eventPost.slice(0, 100)}...`);
+      } catch (err: any) {
+        console.error('[GROWTH_INTEL] Community event generation failed:', err.message);
+      }
     } else if (decision.includes('ALERT_TEAM')) {
-      console.log('[GROWTH_INTEL] ALERT: Team attention needed');
+      const alertDetails = decision.split('ALERT_TEAM:')[1]?.trim() || 'Growth metrics need attention';
+      this.lastAlert = alertDetails;
+      console.log(`[GROWTH_INTEL] ALERT queued: ${alertDetails.slice(0, 200)}`);
     }
 
     return decision;
+  }
+
+  /**
+   * Consume pending community event (returns and clears it).
+   */
+  consumeCommunityEvent(): string | null {
+    const event = this.lastCommunityEvent;
+    this.lastCommunityEvent = null;
+    return event;
+  }
+
+  /**
+   * Consume pending alert (returns and clears it).
+   */
+  consumeAlert(): string | null {
+    const alert = this.lastAlert;
+    this.lastAlert = null;
+    return alert;
   }
 }
 

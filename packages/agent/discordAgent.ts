@@ -365,6 +365,15 @@ class DiscordAgent {
           const randomEngage = Math.random() < 0.10;
 
           if (isRelevant || randomEngage) {
+            // Proactive emoji reaction before replying
+            try {
+              const emoji = lowerContent.includes('market') || lowerContent.includes('price') || lowerContent.includes('pump')
+                ? '🔮' : lowerContent.includes('gm') || lowerContent.includes('wagmi')
+                ? '🫡' : lowerContent.includes('predict') || lowerContent.includes('oracle')
+                ? '🎯' : '⚡';
+              await message.react(emoji);
+            } catch { /* non-critical — react permissions may be missing */ }
+
             // Rate limit: don't respond more than once every 45s per channel/thread
             // Set timestamp BEFORE async call to prevent concurrent responses
             const channelKey = `channel_${message.channelId}`;

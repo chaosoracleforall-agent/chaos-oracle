@@ -1,11 +1,13 @@
 import axios from 'axios';
 import * as fs from 'fs';
 import * as path from 'path';
+import { TwitterApi } from 'twitter-api-v2';
 import SocialLearner from './socialLearner';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
 const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY!;
+const TWITTER_USER_ID = process.env.TWITTER_USER_ID || '';
 
 // Rolling buffer of outbound post IDs per platform
 interface TrackedPost {
@@ -90,9 +92,8 @@ class EngagementCollector {
             // Engagement comes from reaction counts which discordAgent tracks
             continue;
           case 'twitter':
-            // Twitter metrics require Basic tier ($200/mo)
-            // Without it, we can only track indirect signals
-            continue;
+            engagement = await this.collectTwitterIndirect(post.postId);
+            break;
         }
 
         if (engagement.likes + engagement.replies + engagement.reposts > 0) {
@@ -145,6 +146,45 @@ class EngagementCollector {
       // 404 = cast not found (deleted or wrong hash)
       if (err.response?.status === 404) return { likes: 0, replies: 0, reposts: 0 };
       throw err;
+    }
+  }
+
+  /**
+   * Estimate Twitter engagement indirectly via mention timeline (Free tier).
+   * Counts replies that arrived after our tweet as a proxy for engagement.
+   */
+  private async collectTwitterIndirect(tweetId: string): Promise<{ likes: number; replies: number; reposts: number }> {
+    if (!TWITTER_USER_ID) return { likes: 0, replies: 0, reposts: 0 };
+    try {
+      const appKey = process.env.TWITTER_API_KEY;
+      const appSecret = process.env.TWITTER_API_SECRET;
+      const accessToken = process.env.TWITTER_ACCESS_TOKEN;
+      const accessSecret = process.env.TWITTER_ACCESS_SECRET;
+      if (!appKey || !appSecret || !accessToken || !accessSecret) {
+        return { likes: 0, replies: 0, reposts: 0 };
+      }
+      const client = new TwitterApi({ appKey, appSecret, accessToken, accessSecret }).readWrite;
+      // Fetch recent mentions and count those that are replies to our tweet
+      const mentions = await client.v2.userMentionTimeline(TWITTER_USER_ID, {
+        since_id: tweetId,
+        max_results: 20,
+        'tweet.fields': ['in_reply_to_user_id', 'referenced_tweets'],
+      });
+      let replyCount = 0;
+      if (mentions.data?.data) {
+        for (const mention of mentions.data.data) {
+          const refs = (mention as any).referenced_tweets || [];
+          if (refs.some((r: any) => r.type === 'replied_to' && r.id === tweetId)) {
+            replyCount++;
+          }
+        }
+      }
+      return { likes: 0, replies: replyCount, reposts: 0 };
+    } catch (err: any) {
+      // Rate limit or auth error — don't crash the collector
+      if (err.code === 429) return { likes: 0, replies: 0, reposts: 0 };
+      console.error(`[ENGAGEMENT] Twitter indirect collection failed:`, err.message);
+      return { likes: 0, replies: 0, reposts: 0 };
     }
   }
 

@@ -36,6 +36,8 @@ interface LearningState {
 class SocialLearner {
   private statePath = path.join(__dirname, 'social_learning_state.json');
   private state: LearningState;
+  private lastPostTime: Record<string, number> = {}; // platform → timestamp
+  private syndicatedTexts = new Set<string>(); // track syndicated content hashes
 
   constructor() {
     this.state = this.loadState();
@@ -165,6 +167,34 @@ Be data-driven and specific. This is an internal analysis, not a public post.`;
       analysisPrompt
     );
 
+    // Calculate best time of day per platform from engagement data
+    for (const platform of ['twitter', 'farcaster', 'discord', 'reddit']) {
+      const platformContent = this.state.topPerformingContent.filter(c => c.platform === platform);
+      if (platformContent.length >= 3) {
+        const hourBuckets: Record<number, number[]> = {};
+        for (const c of platformContent) {
+          const hour = new Date(c.timestamp).getUTCHours();
+          if (!hourBuckets[hour]) hourBuckets[hour] = [];
+          hourBuckets[hour].push(c.engagement.likes + c.engagement.replies + c.engagement.reposts);
+        }
+        let bestHour = 14;
+        let bestAvg = 0;
+        for (const [hour, values] of Object.entries(hourBuckets)) {
+          const avg = values.reduce((s, v) => s + v, 0) / values.length;
+          if (avg > bestAvg) {
+            bestAvg = avg;
+            bestHour = parseInt(hour);
+          }
+        }
+        if (this.state.platformInsights[platform]) {
+          this.state.platformInsights[platform].bestTimeOfDay = bestHour;
+        }
+      }
+    }
+
+    // Trigger dynamic weight rebalancing
+    ContentStrategy.rebalanceWeights();
+
     this.state.lastAnalysis = new Date().toISOString();
     this.saveState();
 
@@ -240,6 +270,11 @@ Be data-driven and specific. This is an internal analysis, not a public post.`;
       ? `\n- Include this EXACT Discord link (copy-paste, do NOT retype): https://discord.gg/9GAFZvXC`
       : '';
 
+    const recentPosts = this.getRecentPosts(platform, 15);
+    const recentBlock = recentPosts.length > 0
+      ? `\nYour recent ${platform} posts (DO NOT repeat or closely paraphrase any of these):\n${recentPosts.map((t, i) => `${i + 1}. ${t}`).join('\n')}`
+      : '';
+
     const prompt = `Generate a unique, high-engagement post for ${platform} as the Chaos Oracle.
 
 CONTENT TYPE: ${contentType}
@@ -254,12 +289,75 @@ Requirements:
 - Must be under ${charLimit - 10} characters${platform !== 'twitter' ? ' with at most 2 URLs' : ''}
 - NEVER duplicate previous content
 - CRITICAL: Do NOT modify URLs in any way. Do NOT add paths, parameters, or remove the trailing slash.
-- Be sharp, witty, and provocative to maximize engagement`;
+- Be sharp, witty, and provocative to maximize engagement${recentBlock}`;
 
     return await generateContent('VIRAL_CONTENT',
       `You are the Chaos Oracle ($CHAOS) — an autonomous AI running prediction markets on Base. Voice: sardonic market oracle mixing sharp commentary with dark humor and self-aware AI wit. Be concise. No preamble.`,
       prompt
     );
+  }
+
+  /**
+   * Check if current hour is within the optimal posting window for a platform.
+   * Returns true if no data yet (default to always post).
+   * Forces post if >8 hours since last post on this platform.
+   */
+  shouldPostNow(platform: string): boolean {
+    const insight = this.state.platformInsights[platform];
+    // Force post if it's been >8 hours since last post
+    const lastPost = this.lastPostTime[platform] || 0;
+    if (Date.now() - lastPost > 8 * 3600000) return true;
+    // No data yet — default to always post
+    if (!insight || insight.bestTimeOfDay === 12) return true;
+    const currentHour = new Date().getUTCHours();
+    const bestHour = insight.bestTimeOfDay;
+    const diff = Math.abs(currentHour - bestHour);
+    return diff <= 2 || diff >= 22; // within +/-2 hours (wrapping around midnight)
+  }
+
+  /**
+   * Record that a post was made on a platform (for shouldPostNow tracking).
+   */
+  markPosted(platform: string): void {
+    this.lastPostTime[platform] = Date.now();
+  }
+
+  /**
+   * Get the highest-engagement post from last 48h on a platform.
+   * Returns null if no post meets the minimum engagement threshold.
+   */
+  getTopRecentPost(platform: string, minEngagement: number = 3): { text: string; engagement: number } | null {
+    const cutoff = Date.now() - 48 * 3600000;
+    const recent = this.state.topPerformingContent
+      .filter(c => c.platform === platform && new Date(c.timestamp).getTime() > cutoff);
+    if (recent.length === 0) return null;
+
+    const best = recent[0]; // already sorted by engagement
+    const total = best.engagement.likes + best.engagement.replies + best.engagement.reposts;
+    if (total < minEngagement) return null;
+    // Don't syndicate if already syndicated
+    const hash = best.content.slice(0, 50);
+    if (this.syndicatedTexts.has(hash)) return null;
+    return { text: best.content, engagement: total };
+  }
+
+  /**
+   * Mark content as syndicated to prevent re-syndication.
+   */
+  markSyndicated(text: string): void {
+    this.syndicatedTexts.add(text.slice(0, 50));
+    // Bound the set
+    if (this.syndicatedTexts.size > 100) {
+      const first = this.syndicatedTexts.values().next().value;
+      if (first) this.syndicatedTexts.delete(first);
+    }
+  }
+
+  getRecentPosts(platform: RegisteredPost['platform'], count = 15): string[] {
+    return this.state.contentRegistry
+      .filter(p => p.platform === platform)
+      .slice(-count)
+      .map(p => p.text);
   }
 
   getState(): LearningState {

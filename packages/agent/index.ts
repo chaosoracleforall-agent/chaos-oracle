@@ -15,6 +15,8 @@ import NFTEngine from './nftEngine';
 import NFTReportAgent from './nftReportAgent';
 import MoltbookAgent from './moltbookAgent';
 import SecretsManager from './secretsManager';
+import { generateContent } from './modelRouter';
+import axios from 'axios';
 import * as dotenv from 'dotenv';
 dotenv.config(); // Load .env first as fallback, then overlay with GCP secrets
 
@@ -103,6 +105,17 @@ async function main() {
         try {
           if (!KillSwitch.checkStatus()) return;
           await GrowthIntelligence.evaluateAndAct();
+          // Broadcast community event if one was generated
+          const communityEvent = GrowthIntelligence.consumeCommunityEvent();
+          if (communityEvent) {
+            await DiscordAgent.broadcastGrowthUpdate('COMMUNITY EVENT', communityEvent);
+            try { await ChaosBrain.postFarcasterCast(communityEvent); } catch (err) { console.error('[AGENT] Community event Farcaster error:', err instanceof Error ? err.message : err); }
+          }
+          // Send alert email if one was generated
+          const alert = GrowthIntelligence.consumeAlert();
+          if (alert) {
+            try { await EmailAgent.sendPredatoryEmail(process.env.EMAIL || '', 'Growth Intelligence Alert', alert); } catch (err) { console.error('[AGENT] Alert email error:', err instanceof Error ? err.message : err); }
+          }
         } catch (err) {
           console.error("[AGENT] Growth intelligence error:", err);
           // Fallback to legacy strategic growth
@@ -112,8 +125,11 @@ async function main() {
       };
       setTimeout(runStratLoop, stratInterval());
 
-      // 3. Social Content Loop (Every 4-5 hours + jitter)
-      const viralInterval = () => 14400000 + Math.floor(Math.random() * 3600000); // 4-5 hours
+      // 3. Social Content Loop (Every 4-5 hours, 2-3h during posting boost)
+      const viralInterval = () => {
+        const base = GrowthIntelligence.getPostingBoost() ? 7200000 : 14400000; // 2h boosted, 4h normal
+        return base + Math.floor(Math.random() * 3600000);
+      };
       const runViralLoop = async () => {
         try {
           if (!KillSwitch.checkStatus()) return;
@@ -362,12 +378,71 @@ async function main() {
             try { await TwitterAgent.postCustomTweet(result.leaderboardAnnouncement.replace(/\n/g, ' | ')); } catch (err) { console.error('[AGENT] Leaderboard tweet error:', err instanceof Error ? err.message : err); }
             try { await ChaosBrain.postFarcasterCast(result.leaderboardAnnouncement); } catch (err) { console.error('[AGENT] Leaderboard Farcaster post error:', err instanceof Error ? err.message : err); }
           }
+
+          // Streak shoutouts — post to social channels
+          for (const shoutout of result.streakShoutouts) {
+            const streakPost = `${shoutout}\n\nhttps://chaos-oracle-147d0.web.app/`;
+            try { await TwitterAgent.postCustomTweet(streakPost); } catch (err) { console.error('[AGENT] Streak tweet error:', err instanceof Error ? err.message : err); }
+            try { await ChaosBrain.postFarcasterCast(streakPost); } catch (err) { console.error('[AGENT] Streak Farcaster error:', err instanceof Error ? err.message : err); }
+            await DiscordAgent.broadcastGrowthUpdate('STREAK SHOUTOUT', shoutout);
+          }
         } catch (err) {
           console.error('[AGENT] Growth engine loop error:', err);
         }
       };
       setTimeout(runGrowthLoop, 60000);
       setInterval(runGrowthLoop, 1200000);
+
+      // 18. Farcaster Quote Casts + Proactive Likes (Every 6 hours)
+      setInterval(async () => {
+        try {
+          if (!KillSwitch.checkStatus()) return;
+          const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY;
+          if (!NEYNAR_API_KEY) return;
+
+          // Fetch trending casts
+          const trendingRes = await axios.get('https://api.neynar.com/v2/farcaster/feed/trending', {
+            params: { limit: 20 },
+            headers: { 'x-api-key': NEYNAR_API_KEY },
+          });
+          const casts = trendingRes.data?.casts || [];
+
+          // Filter for crypto/prediction relevance
+          const RELEVANCE_KEYWORDS = ['crypto', 'market', 'predict', 'base', 'defi', 'trade', 'ai', 'agent', 'bet', 'oracle', 'token', 'nft'];
+          const relevant = casts.filter((c: any) =>
+            RELEVANCE_KEYWORDS.some(kw => (c.text || '').toLowerCase().includes(kw))
+          );
+
+          // Like up to 8 relevant casts
+          let liked = 0;
+          for (const cast of relevant.slice(0, 8)) {
+            if (await ChaosBrain.likeCast(cast.hash)) liked++;
+          }
+          if (liked > 0) console.log(`[FARCASTER] Proactively liked ${liked} trending casts`);
+
+          // Quote cast up to 2 relevant trending casts
+          let quoted = 0;
+          for (const cast of relevant.slice(0, 2)) {
+            try {
+              const commentary = await generateContent('VIRAL_CONTENT',
+                'You are the Chaos Oracle — autonomous AI running prediction markets on Base. Add sharp, witty commentary to this trending cast. Under 200 chars. No preamble.',
+                `Trending cast by @${cast.author?.username || 'anon'}: "${(cast.text || '').slice(0, 300)}"`
+              );
+              const hash = await ChaosBrain.quoteCast(cast.hash, cast.author?.fid || 0, commentary);
+              if (hash) {
+                EngagementCollector.trackPost('farcaster', commentary, hash);
+                SocialLearner.registerPost('farcaster', commentary, hash);
+                quoted++;
+              }
+            } catch (err) {
+              console.error('[FARCASTER] Quote cast error:', (err as Error).message);
+            }
+          }
+          if (quoted > 0) console.log(`[FARCASTER] Posted ${quoted} quote casts`);
+        } catch (err) {
+          console.error('[AGENT] Farcaster quote cast loop error:', err);
+        }
+      }, 21600000); // 6 hours
 
       // Send initial NFT report 2 minutes after startup
       setTimeout(async () => {
@@ -431,31 +506,58 @@ async function executeStrategicGrowth() {
 async function executeSocialViralization() {
     console.log("[VIRALIZATION] Executing social content push...");
     try {
-        const twitterPost = await SocialLearner.generateOptimizedPost('twitter');
-        console.log(`[VIRALIZATION] Twitter content: ${twitterPost.slice(0, 100)}...`);
-
-        try {
-            // Use the optimized post instead of generating a new one
-            await TwitterAgent.postCustomTweet(twitterPost);
-        } catch (tErr) {
-            console.error("[VIRALIZATION] Twitter post failed:", (tErr as Error).message);
+        // Time-of-day optimization: skip if not optimal window (unless forced)
+        if (!SocialLearner.shouldPostNow('twitter')) {
+          console.log('[VIRALIZATION] Skipping — outside optimal posting window for Twitter');
+        } else {
+          const twitterPost = await SocialLearner.generateOptimizedPost('twitter');
+          console.log(`[VIRALIZATION] Twitter content: ${twitterPost.slice(0, 100)}...`);
+          try {
+              await TwitterAgent.postCustomTweet(twitterPost);
+              SocialLearner.markPosted('twitter');
+          } catch (tErr) {
+              console.error("[VIRALIZATION] Twitter post failed:", (tErr as Error).message);
+          }
+          SocialLearner.registerPost('twitter', twitterPost);
         }
 
         const farcasterPost = await SocialLearner.generateOptimizedPost('farcaster');
         console.log(`[VIRALIZATION] Farcaster content: ${farcasterPost.slice(0, 100)}...`);
         try {
             const castHash = await ChaosBrain.postFarcasterCast(farcasterPost);
-            // Register with engagement collector for metrics tracking
             if (castHash) {
               EngagementCollector.trackPost('farcaster', farcasterPost, castHash);
             }
+            SocialLearner.markPosted('farcaster');
         } catch (fErr) {
             console.error("[VIRALIZATION] Farcaster post failed:", (fErr as Error).message);
         }
-
-        // Register posts in SocialLearner for content optimization
-        SocialLearner.registerPost('twitter', twitterPost);
         SocialLearner.registerPost('farcaster', farcasterPost);
+
+        // Cross-platform syndication: 30% chance to repurpose top Farcaster content to Twitter
+        if (Math.random() < 0.3) {
+          const topFarcaster = SocialLearner.getTopRecentPost('farcaster', 3);
+          if (topFarcaster) {
+            try {
+              const rephrased = await generateContent('VIRAL_CONTENT',
+                'You are the Chaos Oracle. Rephrase this Farcaster post for Twitter/X audience. Keep the core message but adjust tone for CT. Under 240 chars. Include https://chaos-oracle-147d0.web.app/',
+                `Original post (${topFarcaster.engagement} engagements): "${topFarcaster.text}"`
+              );
+              await TwitterAgent.postCustomTweet(rephrased);
+              SocialLearner.markSyndicated(topFarcaster.text);
+              SocialLearner.registerPost('twitter', rephrased);
+              console.log(`[VIRALIZATION] Syndicated top Farcaster post to Twitter`);
+            } catch (err) {
+              console.error('[VIRALIZATION] Syndication failed:', (err as Error).message);
+            }
+          }
+        }
+
+        // Posting boost: if GrowthIntelligence activated boost, also push to Discord
+        if (GrowthIntelligence.getPostingBoost()) {
+          console.log('[VIRALIZATION] Posting boost active — additional Discord push');
+          try { await DiscordAgent.postEngagementContent(); } catch (err) { console.error('[VIRALIZATION] Boost Discord push failed:', (err as Error).message); }
+        }
 
     } catch (error) {
         console.error("[VIRALIZATION] Social push failed:", error);
