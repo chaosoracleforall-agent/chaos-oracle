@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.2.3] - 2026-04-03
+
+### Fixed
+- **Claim NFT page not rendering** — `/claim` was showing the landing page instead of the Chaos Cards claim UI. Root cause: RainbowKit's `getDefaultConfig()` internally calls `getRecomendedWallets()` which fetches wallet listings from the WalletConnect Cloud API. That API returns null/undefined data, causing a `TypeError: Cannot convert undefined or null to object` that crashed the entire React Provider tree. When Providers crashed, Next.js fell back to rendering the root page content on all routes.
+
+### Changed
+- `packages/frontend/app/providers.tsx` — Replaced `getDefaultConfig()` with explicit wallet configuration using `connectorsForWallets()` + `createConfig()`. This bypasses the broken WalletConnect wallet discovery API while still providing MetaMask, Coinbase Wallet, WalletConnect, and Rainbow wallet options.
+
 ## [4.2.2] - 2026-04-03
 
 ### Fixed

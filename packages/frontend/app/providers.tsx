@@ -3,23 +3,40 @@
 import { useState, useEffect } from 'react';
 import '@rainbow-me/rainbowkit/styles.css';
 import {
-  getDefaultConfig,
+  connectorsForWallets,
   RainbowKitProvider,
   darkTheme,
 } from '@rainbow-me/rainbowkit';
-import { WagmiProvider, http } from 'wagmi';
+import {
+  metaMaskWallet,
+  coinbaseWallet,
+  walletConnectWallet,
+  rainbowWallet,
+} from '@rainbow-me/rainbowkit/wallets';
+import { createConfig, WagmiProvider, http } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 
-// THE AGENT IS HARDENING THIS CONFIG FOR META-MASK STABILITY
-const config = getDefaultConfig({
-  appName: 'Chaos Oracle',
-  projectId: '3f2d2165c699981880497799195e8656', 
+const connectors = connectorsForWallets(
+  [
+    {
+      groupName: 'Popular',
+      wallets: [metaMaskWallet, coinbaseWallet, walletConnectWallet, rainbowWallet],
+    },
+  ],
+  {
+    appName: 'Chaos Oracle',
+    projectId: '3f2d2165c699981880497799195e8656',
+  }
+);
+
+const config = createConfig({
+  connectors,
   chains: [base],
   transports: {
-    [base.id]: http('https://mainnet.base.org'), 
+    [base.id]: http('https://mainnet.base.org'),
   },
-  ssr: true, 
+  ssr: true,
 });
 
 const queryClient = new QueryClient();
