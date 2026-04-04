@@ -50,8 +50,10 @@ class SocialLearner {
     try {
       if (fs.existsSync(this.statePath)) {
         const loaded = JSON.parse(fs.readFileSync(this.statePath, 'utf8'));
-        // Ensure contentRegistry exists (migration from old state)
+        // Ensure fields exist (migration from old state files)
         if (!loaded.contentRegistry) loaded.contentRegistry = [];
+        if (!loaded.platformInsights) loaded.platformInsights = {};
+        if (!loaded.topPerformingContent) loaded.topPerformingContent = [];
         return loaded;
       }
     } catch (err) {
