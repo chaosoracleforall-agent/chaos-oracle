@@ -5,6 +5,9 @@ export interface TwitterDiagnosticsSnapshot {
   dailyTweets: number;
   repliesSent: number;
   validationWarnings: number;
+  dailyLikes: number;
+  dailyQuotes: number;
+  searchesRun: number;
   lastContext: string | null;
   lastTweetLength: number;
   lastUrls: string[];
@@ -48,6 +51,9 @@ function createDefaultState(): SocialDiagnosticsState {
       dailyTweets: 0,
       repliesSent: 0,
       validationWarnings: 0,
+      dailyLikes: 0,
+      dailyQuotes: 0,
+      searchesRun: 0,
       lastContext: null,
       lastTweetLength: 0,
       lastUrls: [],
@@ -219,6 +225,7 @@ export function formatSocialDiagnostics(state: SocialDiagnosticsState, verbose: 
   const lines = [
     '[SOCIAL_DIAG]',
     `Twitter daily=${twitter.dailyTweets} replies=${twitter.repliesSent} warnings=${twitter.validationWarnings}`,
+    `Twitter engagement: likes=${twitter.dailyLikes} quotes=${twitter.dailyQuotes} searches=${twitter.searchesRun}`,
     `Twitter last=${twitter.lastContext || 'none'} len=${twitter.lastTweetLength} urls=${twitter.lastUrls.join(', ') || 'none'}`,
     `Twitter warning detail=${twitterWarnings}`,
     `Discord dm=${discord.dmReceived} monitored=${discord.monitoredMessages} replies=${discord.repliesSent}`,

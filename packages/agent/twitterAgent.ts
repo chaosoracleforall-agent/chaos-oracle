@@ -18,7 +18,11 @@ const MAX_TWEETS_PER_DAY = 25;       // Total tweets + replies per 24h (X limit 
 const MAX_REPLIES_PER_SCAN = 3;       // Don't machine-gun reply to all mentions
 const REPLY_DELAY_MIN_MS = 45000;     // 45s minimum between replies (human-like)
 const REPLY_DELAY_MAX_MS = 120000;    // 2min max delay
-const USER_REPLY_COOLDOWN_MS = 86400000; // 24h — don't reply to same user twice per day
+const USER_REPLY_COOLDOWN_MS = 14400000; // 4h — allow actual back-and-forth conversations
+const MAX_LIKES_PER_DAY = 80;            // Twitter Basic allows ~100
+const MAX_QUOTES_PER_DAY = 5;            // Conservative quote tweet limit
+const MAX_SEARCHES_PER_15MIN = 10;       // Twitter Basic allows 60
+const SEARCH_ENGAGE_COOLDOWN_MS = 18000000; // 5h internal cooldown between search-engage runs
 const SELF_USER_ID = process.env.TWITTER_USER_ID || '';
 
 // ============ LAZY CLIENT INIT ============
@@ -76,12 +80,31 @@ function extractUrls(text: string): string[] {
 
 // ============ TWITTER AGENT ============
 
+// ============ SEARCH QUERIES FOR PROACTIVE ENGAGEMENT ============
+const SEARCH_QUERIES = [
+  'prediction market crypto -is:retweet',
+  'base chain defi -is:retweet',
+  '"AI agent" crypto -is:retweet',
+  'onchain betting -is:retweet',
+  '$CHAOS oracle -is:retweet',
+  'crypto oracle prediction -is:retweet',
+  'base L2 prediction -is:retweet',
+  'autonomous AI defi -is:retweet',
+];
+
 class TwitterAgent {
   private lastMentionId?: string;
   private dailyTweetCount: Record<string, number> = {};   // date → count
   private userReplyCooldowns: Record<string, number> = {}; // authorId → timestamp
   private replyCount = 0;
   private validationWarnings = 0;
+
+  // Engagement tracking
+  private dailyLikeCount: Record<string, number> = {};
+  private dailyQuoteCount: Record<string, number> = {};
+  private searchTimestamps: number[] = [];
+  private likedTweetIds = new Set<string>();
+  private lastSearchEngageTime = 0;
 
   constructor() {
     this.persistDiagnostics();
@@ -120,6 +143,45 @@ class TwitterAgent {
     }
   }
 
+  // ============ LIKE RATE LIMITS ============
+  private canLikeToday(): boolean {
+    const today = this.getToday();
+    return (this.dailyLikeCount[today] || 0) < MAX_LIKES_PER_DAY;
+  }
+
+  private recordLike(): void {
+    const today = this.getToday();
+    this.dailyLikeCount[today] = (this.dailyLikeCount[today] || 0) + 1;
+    for (const key of Object.keys(this.dailyLikeCount)) {
+      if (key !== today) delete this.dailyLikeCount[key];
+    }
+  }
+
+  // ============ QUOTE TWEET RATE LIMITS ============
+  private canQuoteToday(): boolean {
+    const today = this.getToday();
+    return (this.dailyQuoteCount[today] || 0) < MAX_QUOTES_PER_DAY;
+  }
+
+  private recordQuoteTweet(): void {
+    const today = this.getToday();
+    this.dailyQuoteCount[today] = (this.dailyQuoteCount[today] || 0) + 1;
+    for (const key of Object.keys(this.dailyQuoteCount)) {
+      if (key !== today) delete this.dailyQuoteCount[key];
+    }
+  }
+
+  // ============ SEARCH RATE LIMITS (sliding window) ============
+  private canSearchNow(): boolean {
+    const cutoff = Date.now() - 15 * 60 * 1000; // 15 minutes
+    this.searchTimestamps = this.searchTimestamps.filter(t => t > cutoff);
+    return this.searchTimestamps.length < MAX_SEARCHES_PER_15MIN;
+  }
+
+  private recordSearch(): void {
+    this.searchTimestamps.push(Date.now());
+  }
+
   getDailyStats(): string {
     const today = this.getToday();
     const count = this.dailyTweetCount[today] || 0;
@@ -137,6 +199,9 @@ class TwitterAgent {
       dailyTweets: this.dailyTweetCount[today] || 0,
       repliesSent: this.replyCount,
       validationWarnings: this.validationWarnings,
+      dailyLikes: this.dailyLikeCount[today] || 0,
+      dailyQuotes: this.dailyQuoteCount[today] || 0,
+      searchesRun: this.searchTimestamps.length,
       ...extra,
     });
   }
@@ -212,7 +277,7 @@ class TwitterAgent {
 
         // Skip users we've already replied to today
         if (this.isUserOnCooldown(targetAuthorId)) {
-          console.log(`[X_AGENT] Skipping @${getUsername(targetAuthorId, mentions.data.includes)} (24h cooldown)`);
+          console.log(`[X_AGENT] Skipping @${getUsername(targetAuthorId, mentions.data.includes)} (4h cooldown)`);
           continue;
         }
 
@@ -232,8 +297,15 @@ class TwitterAgent {
           }
         }
 
-        // Normal reply
-        const replyText = await ChaosBrain.generateResponse(targetAuthorId, tweet.text);
+        // Normal reply — use Sonnet (VIRAL_CONTENT) for higher quality responses
+        const replyPrompt = `You're replying to @${username} on X/Twitter who said: "${tweet.text.slice(0, 500)}"
+
+Reply as the Chaos Oracle — autonomous AI prediction market on Base. Be witty, sharp, and engaging.
+Keep it under 240 chars. No preamble, just the reply text. Drive conversation, not promotion.`;
+        const replyText = await generateContent('VIRAL_CONTENT',
+          'You are the Chaos Oracle ($CHAOS) — autonomous AI running prediction markets on Base. Sardonic wit, sharp takes. Never shill. Be conversational.',
+          replyPrompt
+        );
         console.log(`[X_AGENT] Reply to @${username}: ${replyText.slice(0, 100)}...`);
 
         try {
@@ -378,7 +450,10 @@ class TwitterAgent {
         Mix up the style — sometimes market commentary, sometimes philosophical, sometimes a bold prediction.
         Never be spammy, repetitive, or use excessive hashtags. Max 2 hashtags.${recentBlock}`;
       const post = await ChaosBrain.generateResponse("SYSTEM_INTERNAL", prompt);
-      const withUrls = injectUrlsPostGeneration(post, { siteUrl: true, discordUrl: includeDiscord, maxLen: 280 });
+      // Only inject URLs 40% of the time — not every tweet needs to be a CTA
+      const withUrls = Math.random() < 0.4
+        ? injectUrlsPostGeneration(post, { siteUrl: true, discordUrl: includeDiscord, maxLen: 280 })
+        : post;
       const tweetText = sanitizePostText(withUrls, 280);
       this.logTweetDiagnostics('manifesto tweet', tweetText);
 
@@ -400,6 +475,196 @@ class TwitterAgent {
       console.error("[X_AGENT] Post failed:", error.code || error.message);
     }
   }
+  // ============ PROACTIVE ENGAGEMENT METHODS ============
+
+  /**
+   * Like a tweet. Respects daily limits and dedup.
+   */
+  async likeTweet(tweetId: string): Promise<boolean> {
+    if (!SELF_USER_ID || !this.canLikeToday() || this.likedTweetIds.has(tweetId)) return false;
+    try {
+      const client = getTwitterClient();
+      await client.v2.like(SELF_USER_ID, tweetId);
+      this.recordLike();
+      this.likedTweetIds.add(tweetId);
+      // Bound dedup set
+      if (this.likedTweetIds.size > 500) {
+        const first = this.likedTweetIds.values().next().value;
+        if (first) this.likedTweetIds.delete(first);
+      }
+      return true;
+    } catch (err: any) {
+      // 403 = already liked or protected, not critical
+      if (err?.code === 403 || err?.data?.status === 403) return false;
+      console.error(`[X_AGENT] Like failed for ${tweetId}:`, err.code || err.message);
+      return false;
+    }
+  }
+
+  /**
+   * Quote tweet with AI commentary. Respects daily limits.
+   */
+  async quoteTweet(quotedTweetId: string, commentary: string): Promise<string | undefined> {
+    if (!this.canTweetToday() || !this.canQuoteToday()) return;
+    try {
+      const client = getTwitterClient();
+      const text = sanitizePostText(commentary, 280);
+      this.logTweetDiagnostics('quote tweet', text);
+
+      const validation = this.validateTweetPayload(text);
+      if (!validation.ok) {
+        console.error(`[X_AGENT] BLOCKED quote tweet — broken content: ${validation.warnings.join(' | ')}`);
+        return;
+      }
+
+      const result = await client.v2.quote(text, quotedTweetId);
+      this.recordTweet();
+      this.recordQuoteTweet();
+      SocialLearner.registerPost('twitter', text, result?.data?.id, 'quote_cast');
+      EngagementCollector.trackPost('twitter', text, result?.data?.id);
+      console.log(`[X_AGENT] Quote tweet posted: ${text.slice(0, 100)}...`);
+      return result?.data?.id;
+    } catch (err: any) {
+      console.error('[X_AGENT] Quote tweet failed:', err.code || err.message);
+      return;
+    }
+  }
+
+  /**
+   * Search Twitter for relevant conversations and engage:
+   * - Like up to 8 relevant tweets
+   * - Quote-tweet up to 2 high-quality tweets
+   * - Reply to up to 1 tweet
+   */
+  async searchAndEngage(): Promise<{ liked: number; quoted: number; replied: number }> {
+    const stats = { liked: 0, quoted: 0, replied: 0 };
+
+    // Internal cooldown
+    if (Date.now() - this.lastSearchEngageTime < SEARCH_ENGAGE_COOLDOWN_MS) {
+      console.log('[X_AGENT] Search-engage on cooldown, skipping.');
+      return stats;
+    }
+
+    if (!SELF_USER_ID || !this.canSearchNow()) {
+      console.log('[X_AGENT] Cannot search right now (missing user ID or rate limit).');
+      return stats;
+    }
+
+    try {
+      const client = getTwitterClient();
+
+      // Pick 2 random search queries
+      const shuffled = [...SEARCH_QUERIES].sort(() => Math.random() - 0.5);
+      const queries = shuffled.slice(0, 2);
+      const allTweets: Array<{ id: string; text: string; authorId: string; username: string }> = [];
+
+      for (const query of queries) {
+        if (!this.canSearchNow()) break;
+        try {
+          this.recordSearch();
+          const searchResult = await client.v2.search(query, {
+            max_results: 10,
+            'tweet.fields': ['author_id', 'text', 'public_metrics'],
+            expansions: ['author_id'],
+            'user.fields': ['username'],
+          });
+
+          if (searchResult.data?.data) {
+            for (const tweet of searchResult.data.data) {
+              // Skip own tweets and already-liked
+              if (tweet.author_id === SELF_USER_ID) continue;
+              if (this.likedTweetIds.has(tweet.id)) continue;
+              const username = getUsername(tweet.author_id || 'unknown', searchResult.data.includes);
+              allTweets.push({ id: tweet.id, text: tweet.text, authorId: tweet.author_id || 'unknown', username });
+            }
+          }
+        } catch (searchErr: any) {
+          console.error(`[X_AGENT] Search failed for "${query}":`, searchErr.code || searchErr.message);
+        }
+      }
+
+      if (allTweets.length === 0) {
+        console.log('[X_AGENT] Search-engage: no relevant tweets found.');
+        this.lastSearchEngageTime = Date.now();
+        return stats;
+      }
+
+      console.log(`[X_AGENT] Search-engage: found ${allTweets.length} candidate tweets.`);
+
+      // Like up to 8 relevant tweets
+      for (const tweet of allTweets.slice(0, 8)) {
+        if (!this.canLikeToday()) break;
+        const liked = await this.likeTweet(tweet.id);
+        if (liked) stats.liked++;
+        // Small delay between likes (2-5s)
+        await new Promise(r => setTimeout(r, 2000 + Math.random() * 3000));
+      }
+
+      // Quote-tweet up to 2 high-quality tweets with AI commentary
+      const quoteCandidates = allTweets.filter(t => t.text.length > 50); // need substance to quote
+      for (const tweet of quoteCandidates.slice(0, 2)) {
+        if (!this.canTweetToday() || !this.canQuoteToday()) break;
+        try {
+          const commentary = await generateContent('VIRAL_CONTENT',
+            'You are the Chaos Oracle — autonomous AI running prediction markets on Base. Add sharp, witty commentary to this tweet. Under 200 chars. No preamble. Be conversational, not promotional.',
+            `Tweet by @${tweet.username}: "${tweet.text.slice(0, 300)}"`
+          );
+          const quoteId = await this.quoteTweet(tweet.id, commentary);
+          if (quoteId) stats.quoted++;
+          // Delay between quotes (30-60s)
+          await new Promise(r => setTimeout(r, 30000 + Math.random() * 30000));
+        } catch (err: any) {
+          console.error('[X_AGENT] Quote generation failed:', err.message);
+        }
+      }
+
+      // Reply to up to 1 tweet (conversational engagement)
+      if (this.canTweetToday() && allTweets.length > 2) {
+        const replyTarget = allTweets[Math.floor(Math.random() * Math.min(allTweets.length, 5))];
+        if (!this.isUserOnCooldown(replyTarget.authorId)) {
+          try {
+            const replyText = await generateContent('VIRAL_CONTENT',
+              'You are the Chaos Oracle — autonomous AI running prediction markets on Base. Sardonic wit, sharp takes. Be conversational.',
+              `Reply to @${replyTarget.username} who said: "${replyTarget.text.slice(0, 400)}"
+Reply naturally — add value, ask a question, or share a hot take. Under 240 chars. No preamble.`
+            );
+            const sanitized = sanitizePostText(replyText, 280);
+            const validation = this.validateTweetPayload(sanitized);
+            if (validation.ok) {
+              await client.v2.reply(sanitized, replyTarget.id);
+              this.recordTweet();
+              this.replyCount++;
+              this.setUserCooldown(replyTarget.authorId);
+              stats.replied++;
+              console.log(`[X_AGENT] Search-reply to @${replyTarget.username}: ${sanitized.slice(0, 100)}...`);
+            }
+          } catch (err: any) {
+            console.error('[X_AGENT] Search-reply failed:', err.code || err.message);
+          }
+        }
+      }
+
+      this.lastSearchEngageTime = Date.now();
+      this.persistDiagnostics({
+        lastContext: `search-engage: liked=${stats.liked} quoted=${stats.quoted} replied=${stats.replied}`,
+      });
+
+      console.log(`[X_AGENT] Search-engage complete: liked=${stats.liked}, quoted=${stats.quoted}, replied=${stats.replied}`);
+    } catch (err: any) {
+      console.error('[X_AGENT] Search-engage error:', err.code || err.message);
+    }
+
+    return stats;
+  }
+
+  /**
+   * Get full engagement stats for logging.
+   */
+  getEngagementStats(): string {
+    const today = this.getToday();
+    return `[X_AGENT] Tweets: ${this.dailyTweetCount[today] || 0}/${MAX_TWEETS_PER_DAY} | Likes: ${this.dailyLikeCount[today] || 0}/${MAX_LIKES_PER_DAY} | Quotes: ${this.dailyQuoteCount[today] || 0}/${MAX_QUOTES_PER_DAY}`;
+  }
+
   /**
    * Post a thread (array of tweets chained as replies).
    */

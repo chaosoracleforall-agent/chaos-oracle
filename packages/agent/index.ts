@@ -83,6 +83,18 @@ async function main() {
       // 0. Start Discord Agent
       await DiscordAgent.start();
 
+      // 0.5. Startup tweet (30s-2min after launch)
+      const startupDelay = 30000 + Math.floor(Math.random() * 90000);
+      setTimeout(async () => {
+        try {
+          if (!KillSwitch.checkStatus()) return;
+          await TwitterAgent.postChaosManifesto();
+          console.log('[AGENT] Startup tweet posted.');
+        } catch (err) {
+          console.error('[AGENT] Startup tweet error:', err instanceof Error ? err.message : err);
+        }
+      }, startupDelay);
+
       // 1. Social Engagement Loop (Every 15 min + jitter)
       // X guidelines: avoid clockwork-precise automated actions
       const socialInterval = () => 900000 + Math.floor(Math.random() * 300000); // 15-20 min
@@ -443,6 +455,24 @@ async function main() {
         }
       }, 21600000); // 6 hours
 
+      // 19. Twitter Engagement: Search + Like + Quote (Every 4-6 hours)
+      const twitterEngageInterval = () => 14400000 + Math.floor(Math.random() * 7200000); // 4-6h
+      const runTwitterEngageLoop = async () => {
+        try {
+          if (!KillSwitch.checkStatus()) return;
+          const result = await TwitterAgent.searchAndEngage();
+          if (result.liked > 0 || result.quoted > 0 || result.replied > 0) {
+            console.log(`[X_ENGAGE] Liked=${result.liked} Quoted=${result.quoted} Replied=${result.replied}`);
+          }
+          console.log(TwitterAgent.getEngagementStats());
+        } catch (err) {
+          console.error('[AGENT] Twitter engagement loop error:', err);
+        }
+        setTimeout(runTwitterEngageLoop, twitterEngageInterval());
+      };
+      // Initial delay: 30-60 min after startup
+      setTimeout(runTwitterEngageLoop, 1800000 + Math.floor(Math.random() * 1800000));
+
       // Send initial NFT report 2 minutes after startup
       setTimeout(async () => {
         try {
@@ -505,9 +535,10 @@ async function executeStrategicGrowth() {
 async function executeSocialViralization() {
     console.log("[VIRALIZATION] Executing social content push...");
     try {
-        // Time-of-day optimization: skip if not optimal window (unless forced)
+        // Time-of-day optimization: if not optimal window, do engagement instead of posting
         if (!SocialLearner.shouldPostNow('twitter')) {
-          console.log('[VIRALIZATION] Skipping — outside optimal posting window for Twitter');
+          console.log('[VIRALIZATION] Outside optimal posting window — running engagement instead');
+          try { await TwitterAgent.searchAndEngage(); } catch (err) { console.error('[VIRALIZATION] Engagement fallback error:', (err as Error).message); }
         } else {
           const twitterPost = await SocialLearner.generateOptimizedPost('twitter');
           console.log(`[VIRALIZATION] Twitter content: ${twitterPost.slice(0, 100)}...`);

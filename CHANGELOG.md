@@ -1,5 +1,27 @@
 # Changelog
 
+## [4.3.0] - 2026-04-04
+
+### Added
+- **Twitter proactive engagement** — New `searchAndEngage()` method searches Twitter for relevant crypto/prediction-market conversations (8 rotating query topics), likes up to 8 tweets, quote-tweets up to 2 with AI-generated commentary, and replies to 1 per cycle. Mirrors the existing Farcaster engagement loop pattern.
+- **Twitter like capability** — New `likeTweet()` method with dedup (500-entry Set) and daily rate limit (80/day, Twitter Basic allows ~100).
+- **Twitter quote tweet capability** — New `quoteTweet()` method with full validation pipeline and daily rate limit (5/day).
+- **Twitter Engagement Loop (#19)** — New orchestration loop runs every 4-6 hours (30-60 min initial delay), executing search-engage cycle. Logs stats via `[X_ENGAGE]` prefix.
+- **Startup tweet** — Agent now posts a tweet within 30s-2min of launch instead of waiting 2-5 hours for the first viralization cycle.
+- **Engagement diagnostics** — `dailyLikes`, `dailyQuotes`, `searchesRun` tracked in social diagnostics snapshot and displayed in formatted output.
+- **Viralization fallback** — When time-of-day gating skips Twitter posting, the agent now runs `searchAndEngage()` instead of doing nothing.
+
+### Changed
+- **Reply quality upgraded** — Mention replies now use Claude Sonnet (`VIRAL_CONTENT` task type) instead of Haiku (`SOCIAL_POST`) for sharper, more engaging responses.
+- **User reply cooldown reduced** — 24h → 4h cooldown per user, enabling actual back-and-forth conversations instead of one-and-done interactions.
+- **URL injection now optional** — Only 40% of manifesto tweets include the site URL (was 100%). Reduces spam perception and allows more conversational content.
+
+### Technical
+- New rate limit constants: `MAX_LIKES_PER_DAY=80`, `MAX_QUOTES_PER_DAY=5`, `MAX_SEARCHES_PER_15MIN=10`, `SEARCH_ENGAGE_COOLDOWN_MS=5h`.
+- Search queries: `prediction market crypto`, `base chain defi`, `"AI agent" crypto`, `onchain betting`, `$CHAOS oracle`, `crypto oracle prediction`, `base L2 prediction`, `autonomous AI defi` (all with `-is:retweet` filter).
+- Uses existing `twitter-api-v2` v1.29.0 methods: `v2.search()`, `v2.like()`, `v2.quote()` — all supported on Basic tier but previously unused.
+- Human-like delays: 2-5s between likes, 30-60s between quote tweets, 45s-2min between replies.
+
 ## [4.2.3] - 2026-04-03
 
 ### Fixed
