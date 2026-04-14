@@ -1,5 +1,16 @@
 # Changelog
 
+## [5.0.0] - 2026-04-14
+
+### Project Shutdown
+- **Chaos Oracle permanently shut down** — Project is no longer operational. The autonomous agent, frontend, and all social accounts have been deactivated.
+- **V3 contract paused** — No new bets or markets can be created. `claim()` and `reclaimBet()` still work on-chain for users to recover funds.
+- **Shutdown page deployed** — Firebase Hosting replaced with a static page containing contract addresses and fund recovery instructions.
+- **Credential files removed** — Deleted `.env_vault_decrypted.json` and `.env_temp` from the repository.
+- **Infrastructure decommissioned** — GCP VM, Secret Manager secrets, and all paid API integrations (OpenRouter, Replicate, Neynar, Pinata, Plausible, Twitter API) cancelled.
+- **Social accounts deactivated** — Twitter (@ChaosOracle4all), Farcaster (@chaosmachine), Discord server, Reddit, and Moltbook accounts wound down.
+- See `SHUTDOWN.md` for contract addresses and fund recovery instructions.
+
 ## [4.3.0] - 2026-04-04
 
 ### Added

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chaos Oracle — Shutdown Notice</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #000;
+      color: #e0e0e0;
+      font-family: 'Courier New', monospace;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    .container { max-width: 720px; width: 100%; }
+    h1 {
+      color: #ff6b35;
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+    .subtitle {
+      color: #888;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid #333;
+      padding-bottom: 1rem;
+    }
+    h2 {
+      color: #ff6b35;
+      font-size: 1.1rem;
+      margin: 1.5rem 0 0.75rem;
+    }
+    p, li {
+      line-height: 1.6;
+      margin-bottom: 0.5rem;
+    }
+    ul { padding-left: 1.5rem; }
+    .contract-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.85rem;
+    }
+    .contract-table th, .contract-table td {
+      border: 1px solid #333;
+      padding: 0.5rem;
+      text-align: left;
+    }
+    .contract-table th {
+      background: #1a1a1a;
+      color: #ff6b35;
+    }
+    .contract-table td { word-break: break-all; }
+    a {
+      color: #4da6ff;
+      text-decoration: none;
+    }
+    a:hover { text-decoration: underline; }
+    .steps {
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 4px;
+      padding: 1rem 1.5rem;
+      margin: 1rem 0;
+    }
+    .steps ol { padding-left: 1.2rem; }
+    .steps li { margin-bottom: 0.5rem; }
+    code {
+      background: #1a1a1a;
+      padding: 0.1rem 0.4rem;
+      border-radius: 2px;
+      font-size: 0.9em;
+      color: #4da6ff;
+    }
+    .notice {
+      background: #1a0a00;
+      border-left: 3px solid #ff6b35;
+      padding: 0.75rem 1rem;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Chaos Oracle</h1>
+    <div class="subtitle">This project has been permanently shut down as of April 2026.</div>
+
+    <h2>Claim Your Funds</h2>
+    <p>The smart contracts on Base mainnet remain active. You can interact with them directly via BaseScan.</p>
+
+    <div class="notice">
+      Claims and reclaims work permanently on-chain. No deadline to withdraw your funds.
+    </div>
+
+    <h2>Unresolved Markets</h2>
+    <p>If you bet on a market that was never resolved, reclaim your full bet (no fee) after the market deadline + 7 days:</p>
+    <div class="steps">
+      <ol>
+        <li>Go to the <a href="https://basescan.org/address/0x76b714816689eC9f92F139900a04906ba0FBd34b#writeContract" target="_blank" rel="noopener">V3 Contract Write page</a></li>
+        <li>Connect your wallet</li>
+        <li>Call <code>reclaimBet(marketId)</code> with your market's ID</li>
+      </ol>
+    </div>
+
+    <h2>Resolved Markets</h2>
+    <p>If you won a bet on a resolved market but haven't claimed:</p>
+    <div class="steps">
+      <ol>
+        <li>Go to the relevant contract on BaseScan (see table below)</li>
+        <li>Connect your wallet</li>
+        <li>Call <code>claim(marketId)</code> with your market's ID</li>
+      </ol>
+    </div>
+
+    <h2>Contract Addresses (Base Mainnet)</h2>
+    <table class="contract-table">
+      <thead>
+        <tr><th>Contract</th><th>Address</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>V3 (paused)</td>
+          <td><a href="https://basescan.org/address/0x76b714816689eC9f92F139900a04906ba0FBd34b#writeContract" target="_blank" rel="noopener">0x76b714816689eC9f92F139900a04906ba0FBd34b</a></td>
+        </tr>
+        <tr>
+          <td>V2 (legacy)</td>
+          <td><a href="https://basescan.org/address/0x1b60e2C970Fe6e64c6e067130FF4Ae8a713E93b6#writeContract" target="_blank" rel="noopener">0x1b60e2C970Fe6e64c6e067130FF4Ae8a713E93b6</a></td>
+        </tr>
+        <tr>
+          <td>V1 (legacy)</td>
+          <td><a href="https://basescan.org/address/0x591A48064c1DB035B1562d60ed27cE18B48Bd228#writeContract" target="_blank" rel="noopener">0x591A48064c1DB035B1562d60ed27cE18B48Bd228</a></td>
+        </tr>
+        <tr>
+          <td>ChaosCards NFT</td>
+          <td><a href="https://basescan.org/address/0x4Fc3B3Be82Bd492BC071229B5732f23b4b314ee5" target="_blank" rel="noopener">0x4Fc3B3Be82Bd492BC071229B5732f23b4b314ee5</a></td>
+        </tr>
+        <tr>
+          <td>CHAOS Token</td>
+          <td><a href="https://basescan.org/address/0xA1864203355AeFAd58c051aC984672a6585C77C9" target="_blank" rel="noopener">0xA1864203355AeFAd58c051aC984672a6585C77C9</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
